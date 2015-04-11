@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 
 public class Element {
 
@@ -35,5 +37,8 @@ public class Element {
 		this.x = x;
 	}
 	
-	
+	public String toString() {
+		return "(" + this.getX() + ", " + this.getY() + ")";
+	}
+
 }
