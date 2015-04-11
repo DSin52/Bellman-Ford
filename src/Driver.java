@@ -1,11 +1,11 @@
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Random;
 
 
 public class Driver {
-
+	public static ArrayList<Element> original;
+	
 	public static void main(String[] args) {
 		
 		//Build the cost matrix of the graph
@@ -13,12 +13,13 @@ public class Driver {
 		int[][] costMatrix = {{5, 1, 7}, {13, 1, 2}, {6, 1, 9}};
 				
 		ArrayList<Element> matched = new ArrayList<Element>();
-		ArrayList<Element> unmatched = buildElementMatrix(costMatrix);
+		original = buildElementMatrix(costMatrix);
+		ArrayList<Element> unmatched = new ArrayList<Element>(original);
 		
 		while (matched.size() < costMatrix.length) {
 			int index = 0;
-			while (index < unmatched.size()) {
-				Element ele = unmatched.get(index);
+			while (index < original.size()) {
+				Element ele = original.get(index);
 				//add unique to matching (minimum (augment(index.getX())))
 				HashMap<Integer, ArrayList<Element>> map = augment(ele.getX(), matched, unmatched);
 //				HashMap<Integer, ArrayList<Element>> map = new HashMap<Integer, ArrayList<Element>>();
@@ -33,6 +34,7 @@ public class Driver {
 				for (int i = 0; i < mappings.size(); i++) {
 					if (!matched.contains(mappings.get(i))) {
 						matched.add(mappings.get(i));
+						unmatched = clean(unmatched, mappings.get(i));
 					}
 				}
 				index += costMatrix.length;
@@ -65,10 +67,20 @@ public class Driver {
 	
 	}
 	
+	public static ArrayList<Element> clean(ArrayList<Element> unmatched, Element ele) {
+		ArrayList<Element> cleanedUnmatched = new ArrayList<Element>(unmatched);
+		for (Element unmatchedElement : unmatched) {
+			if (unmatchedElement.getY() == ele.getY()) {
+				cleanedUnmatched.remove(unmatchedElement);
+			}
+		}
+		return cleanedUnmatched;
+	}
+	
 	public static HashMap<Integer, ArrayList<Element>> augment(int index, ArrayList<Element> matched, ArrayList<Element> unmatched) {
 		HashMap<Integer, ArrayList<Element>> iterMap = new HashMap<Integer, ArrayList<Element>>();
 		//Get neighbors of node in set A 
-		ArrayList<Element> neighbors = findElements(index, unmatched, true);
+		ArrayList<Element> neighbors = findElements(index, original, true);
 		for (Element ele: neighbors) {
 			if (unmatched.contains(ele)) {
 				ArrayList<Element> temp = new ArrayList<Element>();
@@ -76,6 +88,9 @@ public class Driver {
 				iterMap.put(ele.getWeight(), temp);
 			} else {
 				ArrayList<Element> matchedValue = findElements(ele.getY(), matched, false);
+				if (matchedValue.contains(ele)) {
+					continue;
+				}
 				if (matchedValue.size() > 0) {
 					HashMap<Integer, ArrayList<Element>> prevMap = augment(matchedValue.get(0).getX(), matched, unmatched);
 					Integer minKey = Collections.min(prevMap.keySet());
@@ -90,7 +105,7 @@ public class Driver {
 		}
 		
 		//Remove all content in the map from unmatched
-		return null;
+		return iterMap;
 		
 	}
 	

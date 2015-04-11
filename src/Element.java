@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 
 
 public class Element {
@@ -38,7 +37,7 @@ public class Element {
 	}
 	
 	public String toString() {
-		return "(" + this.getX() + ", " + this.getY() + ")";
+		return this.getWeight() + ": (" + this.getX() + ", " + this.getY() + ")";
 	}
 
 }
