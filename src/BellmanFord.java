@@ -82,7 +82,7 @@ public class BellmanFord {
 
 			for (DirectedEdge e : original.edges()) {
 				if (bestPath.contains(e)) {
-					DirectedEdge edgeToAdd = new DirectedEdge(e.to(), e.from(), -1 * e.weight());
+					DirectedEdge edgeToAdd = new DirectedEdge(e.to(), e.from(), -1.0 * e.weight());
 					nextIterationGraph.addEdge(edgeToAdd);
 					if (edgeToAdd.weight() < 0) {
 						if (!matching.contains(e.to())) {
@@ -102,15 +102,26 @@ public class BellmanFord {
 
 		for (DirectedEdge edge : original.edges()) {
 			if (edge.weight() < 0) {
-				offlineMatching.add(new DirectedEdge(edge.to(), edge.from(), -1 * edge.weight()));
+				offlineMatching.add(new DirectedEdge(edge.to(), edge.from(), -1.0 * edge.weight()));
 			}
 		}
 
 		// System.out.println("Original: " + original.toString());
 		System.out.println("Digraph: " + offlineMatching.toString());
 		double testCost = 0;
+		boolean[] testDigraph = new boolean[600];
+		for (int i = 0; i < 600; i++) {
+			testDigraph[i] = false;
+		}
 		for (DirectedEdge test : offlineMatching) {
 			testCost += test.weight();
+			if (testDigraph[test.from()] == false && testDigraph[test.to()] == false) {
+			testDigraph[test.from()] = true;
+			testDigraph[test.to()] = true;
+			} else {
+				System.out.println("NO PERFECT MATCHING");
+				return;
+			}
 		}
 
 		System.out.println("TOTAL NET COST: " + totalCost);
