@@ -88,11 +88,11 @@ public class BellmanFord {
 				if (bestPath.contains(e)) {
 					DirectedEdge edgeToAdd = new DirectedEdge(e.to(), e.from(), -1.0 * e.weight());
 					nextIterationGraph.addEdge(edgeToAdd);
-					if (edgeToAdd.weight() < 0) {
+					if (edgeToAdd.weight() <= 0) {
 						if (!matching.contains(e.to())) {
 							matching.add(e.to());
 //							System.out.println("INDEX: " + index);
-							System.out.println("SIZE: " + matching.size());
+//							System.out.println("SIZE: " + matching.size());
 						}
 					}
 					totalCost += e.weight();
@@ -104,7 +104,7 @@ public class BellmanFord {
 			original = nextIterationGraph;
 			
 			index += 1;
-			System.out.println("INDEX: " + index);
+//			System.out.println("INDEX: " + index);
 		}
 
 		for (DirectedEdge edge : original.edges()) {
@@ -116,8 +116,8 @@ public class BellmanFord {
 		// System.out.println("Original: " + original.toString());
 		System.out.println("Digraph: " + offlineMatching.toString());
 		double testCost = 0;
-		boolean[] testDigraph = new boolean[500];
-		for (int i = 0; i < 500; i++) {
+		boolean[] testDigraph = new boolean[1000];
+		for (int i = 0; i < 1000; i++) {
 			testDigraph[i] = false;
 		}
 		for (DirectedEdge test : offlineMatching) {

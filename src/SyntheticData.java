@@ -12,7 +12,7 @@ public class SyntheticData {
 		ArrayList<Integer> setA = new ArrayList<Integer>();
 		ArrayList<Integer> setB = new ArrayList<Integer>();
 
-		for (int i = 0; i < 250; i++) {
+		for (int i = 0; i < 500; i++) {
 			while (true) {
 				int test = randSetA.nextInt(10000);
 				
@@ -35,7 +35,7 @@ public class SyntheticData {
 			}
 		}
 		
-		double[][] costMatrix = new double[250][250];
+		double[][] costMatrix = new double[500][500];
 		
 		for (int i = 0; i < costMatrix.length; i++) {
 			for (int j = 0; j < costMatrix[i].length; j++) {
