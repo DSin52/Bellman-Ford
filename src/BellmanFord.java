@@ -6,24 +6,56 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class BellmanFord {
-	
+
 	private UberObject[] taxis;
 	private UberObject[] customers;
 	private double[][] costMatrix;
 
-	public void computeOfflineMatching(String filename, int nodesToRead) {
-		ArrayList<DirectedEdge> offlineMatching = new ArrayList<DirectedEdge>();
-		
-		ArrayList<Integer> matching = new ArrayList<Integer>();
-
-		parseData(filename, nodesToRead);
-
-		computeCostMatrix();
-
-		// int[][] costMatrix = { { 29, 57, 66, 27, 71, 33 },
+	public void verifyHungarian(String filename, int nodesToRead) {
+		// parseData(filename, nodesToRead);
+		//
+		// computeCostMatrix();
+		double[][] costMatrix = { { 1.2407605944068654, 1.598409646458353, 4.445187312567201, 0.5750987439590294 },
+				{ 2.5812115319943256, 2.3367745613022697, 0.695289740587347, 3.5836292438059973 },
+				{ 1.946676286724372, 1.6714977603974595, 1.37800878742508, 2.9341351129539426 },
+				{ 1.6120755445675552, 1.9684280739081026, 4.801589666570361, 0.8556136958433838 } };
+		// double[][] costMatrix = { { 29, 57, 66, 27, 71, 33 },
 		// { 55, 67, 80, 65, 14, 11 }, { 42, 51, 20, 94, 75, 28 },
 		// { 82, 6, 49, 15, 22, 11 }, { 54, 46, 15, 25, 56, 89 },
 		// { 94, 60, 99, 43, 81, 13 } };
+
+		HungarianAlgorithm test = new HungarianAlgorithm(costMatrix);
+
+		int[] tester = test.execute();
+		double totalCost = 0;
+		for (int i = 0; i < tester.length; i++) {
+			// System.out.print("For job " + i + ", use worker " + tester[i] +
+			// ".\n");
+			totalCost += costMatrix[i][tester[i]];
+		}
+		System.out.println("COST: " + totalCost);
+
+	}
+
+	public void computeOfflineMatching(String filename, int nodesToRead) {
+		ArrayList<DirectedEdge> offlineMatching = new ArrayList<DirectedEdge>();
+
+		ArrayList<Integer> matching = new ArrayList<Integer>();
+
+		// parseData(filename, nodesToRead);
+		//
+		// computeCostMatrix();
+
+		double[][] costMatrix = { { 1.2407605944068654, 1.598409646458353, 4.445187312567201, 0.5750987439590294 },
+				{ 2.5812115319943256, 2.3367745613022697, 0.695289740587347, 3.5836292438059973 },
+				{ 1.946676286724372, 1.6714977603974595, 1.37800878742508, 2.9341351129539426 },
+				{ 1.6120755445675552, 1.9684280739081026, 4.801589666570361, 0.8556136958433838 } };
+
+		// double[][] costMatrix = { { 29, 57, 66, 27, 71, 33 },
+		// { 55, 67, 80, 65, 14, 11 }, { 42, 51, 20, 94, 75, 28 },
+		// { 82, 6, 49, 15, 22, 11 }, { 54, 46, 15, 25, 56, 89 },
+		// { 94, 60, 99, 43, 81, 13 } };
+		// double[][] costMatrix = {{5, 1, 7}, {13, 1, 2}, {6, 1, 9}};
 
 		double totalCost = 0;
 
@@ -36,7 +68,7 @@ public class BellmanFord {
 			Iterator<DirectedEdge> iter = null;
 			ArrayList<DirectedEdge> bestPath = new ArrayList<DirectedEdge>();
 
-			double minPath = Integer.MAX_VALUE;
+			double minPath = Double.MAX_VALUE;
 
 			for (int v = 0 + costMatrix.length; v < original.V(); v++) {
 
@@ -58,13 +90,11 @@ public class BellmanFord {
 				bestPath.add(iter.next());
 			}
 
-			EdgeWeightedDigraph nextIterationGraph = new EdgeWeightedDigraph(
-					costMatrix.length + costMatrix[0].length);
+			EdgeWeightedDigraph nextIterationGraph = new EdgeWeightedDigraph(costMatrix.length + costMatrix[0].length);
 
 			for (DirectedEdge e : original.edges()) {
 				if (bestPath.contains(e)) {
-					DirectedEdge edgeToAdd = new DirectedEdge(e.to(), e.from(),
-							-1 * e.weight());
+					DirectedEdge edgeToAdd = new DirectedEdge(e.to(), e.from(), -1 * e.weight());
 					nextIterationGraph.addEdge(edgeToAdd);
 					if (edgeToAdd.weight() < 0) {
 						if (!matching.contains(e.to())) {
@@ -83,8 +113,7 @@ public class BellmanFord {
 
 		for (DirectedEdge edge : original.edges()) {
 			if (edge.weight() < 0) {
-				offlineMatching.add(new DirectedEdge(edge.to(), edge.from(), -1
-						* edge.weight()));
+				offlineMatching.add(new DirectedEdge(edge.to(), edge.from(), -1 * edge.weight()));
 			}
 		}
 
@@ -99,23 +128,19 @@ public class BellmanFord {
 
 		for (int i = 0; i < costMatrix2.length; i++) {
 			for (int j = 0; j < costMatrix2[0].length; j++) {
-				Element element = new Element(i, j + costMatrix2.length,
-						costMatrix2[i][j]);
+				Element element = new Element(i, j + costMatrix2.length, costMatrix2[i][j]);
 				elementList.add(element);
 			}
 		}
 		return elementList;
 	}
 
-	public static EdgeWeightedDigraph constructDigraphFromMatrix(
-			double[][] costMatrix2) {
-		EdgeWeightedDigraph diGraph = new EdgeWeightedDigraph(
-				costMatrix2.length + costMatrix2[0].length);
+	public static EdgeWeightedDigraph constructDigraphFromMatrix(double[][] costMatrix2) {
+		EdgeWeightedDigraph diGraph = new EdgeWeightedDigraph(costMatrix2.length + costMatrix2[0].length);
 		ArrayList<Element> elements = buildElementMatrix(costMatrix2);
 
 		for (Element ele : elements) {
-			DirectedEdge edge = new DirectedEdge(ele.getX(), ele.getY(),
-					ele.getWeight());
+			DirectedEdge edge = new DirectedEdge(ele.getX(), ele.getY(), ele.getWeight());
 			diGraph.addEdge(edge);
 		}
 		return diGraph;
@@ -132,10 +157,11 @@ public class BellmanFord {
 	private void computeCostMatrix() {
 		for (int i = 0; i < taxis.length; i++) {
 			for (int j = 0; j < customers.length; j++) {
-				costMatrix[i][j] = Distance.haversine(taxis[i].getLatitude(),
-						taxis[i].getLongitude(), customers[j].getLatitude(),
+				costMatrix[i][j] = Distance.haversine(taxis[i].getLatitude(), taxis[i].getLongitude(), customers[j].getLatitude(),
 						customers[j].getLongitude());
+				System.out.print(costMatrix[i][j] + ", ");
 			}
+			System.out.println();
 		}
 	}
 
