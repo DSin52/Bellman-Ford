@@ -100,7 +100,13 @@ public class BellmanFord {
 
 		// System.out.println("Original: " + original.toString());
 		// System.out.println("Digraph: " + offlineMatching.toString());
+		double testCost = 0;
+		for (DirectedEdge test : offlineMatching) {
+			testCost += test.weight();
+		}
+		
 		System.out.println("TOTAL NET COST: " + totalCost);
+		System.out.println("TOTAL TEST COST: " + testCost);
 	}
 
 	public static ArrayList<Element> buildElementMatrix(double[][] costMatrix2) {
