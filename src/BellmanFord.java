@@ -13,10 +13,10 @@ public class BellmanFord {
 	private double[][] costMatrix;
 
 	public void verifyHungarian(String filename, int nodesToRead) {
-//		parseData(filename, nodesToRead);
+		parseData(filename, nodesToRead);
 
-//		computeCostMatrix();
-		costMatrix = new SyntheticData().generateSynthetic();
+		computeCostMatrix();
+//		costMatrix = new SyntheticData().generateSynthetic();
 
 		HungarianAlgorithm test = new HungarianAlgorithm(costMatrix);
 
@@ -33,11 +33,11 @@ public class BellmanFord {
 
 		ArrayList<Integer> matching = new ArrayList<Integer>();
 
-//		parseData(filename, nodesToRead);
-//
-//		computeCostMatrix();
+		parseData(filename, nodesToRead);
+
+		computeCostMatrix();
 		
-		costMatrix = new SyntheticData().generateSynthetic();
+//		costMatrix = new SyntheticData().generateSynthetic();
 
 		double totalCost = 0;
 
@@ -47,8 +47,7 @@ public class BellmanFord {
 		for (int i = 0; i < costMatrix.length; i++) {
 			cards.add(i);
 		}
-//		Collections.shuffle(cards);
-		System.out.println(cards);
+		Collections.shuffle(cards);
 
 		int index = 0;
 
