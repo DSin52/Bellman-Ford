@@ -5,10 +5,11 @@ public class Driver {
 
 		BellmanFord bell = new BellmanFord();
 		int numNodes = 500;
+		String filename = "trip_data_test_1.csv";
 		System.out.println("BELLMAN");
-		bell.computeOfflineMatching("trip_data_1.csv", numNodes);
+		bell.computeOfflineMatching(filename, numNodes);
 		System.out.println();
 		System.out.println("HUNGARIAN");
-		bell.verifyHungarian("trip_data_1.csv", numNodes);
+		bell.verifyHungarian(filename, numNodes);
 	}
 }
