@@ -4,20 +4,20 @@ public class Element {
 
 	private int x;
 	private int y;
-	private int weight;
+	private double weight;
 	
-	public Element(int x, int y, int weight) {
+	public Element(int x, int y, double costMatrix2) {
 		this.setX(x);
 		this.setY(y);
-		this.setWeight(weight);
+		this.setWeight(costMatrix2);
 	}
 
-	public int getWeight() {
+	public double getWeight() {
 		return weight;
 	}
 
-	public void setWeight(int weight) {
-		this.weight = weight;
+	public void setWeight(double costMatrix2) {
+		this.weight = costMatrix2;
 	}
 
 	public int getY() {

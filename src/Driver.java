@@ -1,192 +1,191 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-
+import java.util.Iterator;
 
 public class Driver {
 	public static ArrayList<Element> original;
+
+	static ArrayList<Integer> matching;
+	static ArrayList<DirectedEdge> finalMatching;
+	
+	private static UberObject[] taxis;
+	private static UberObject[] customers;
+	private static double[][] costMatrix;
 	
 	public static void main(String[] args) {
-		
-		//Build the cost matrix of the graph
-//		int [][] costMatrix = new int[Integer.parseInt(args[0])][Integer.parseInt(args[0])];
-		int[][] costMatrix = {{5, 1, 7}, {13, 1, 2}, {6, 1, 9}};
-				
-		ArrayList<Element> matched = new ArrayList<Element>();
-		original = buildElementMatrix(costMatrix);
-		ArrayList<Element> unmatched = new ArrayList<Element>(original);
-		
-		while (matched.size() < costMatrix.length) {
-			int index = 0;
-			while (index < original.size()) {
-				Element ele = original.get(index);
-				//add unique to matching (minimum (augment(index.getX())))
-				HashMap<Integer, ArrayList<Element>> map = augment(ele.getX(), matched, unmatched);
-//				HashMap<Integer, ArrayList<Element>> map = new HashMap<Integer, ArrayList<Element>>();
-//				ArrayList<Element> test = new ArrayList<Element>();
-//				ArrayList<Element> test2 = new ArrayList<Element>();
-//				test.add(new Element(1, 1, 5));
-//				test2.add(new Element(2, 2, 10));
-//				map.put(5, test);
-//				map.put(10, test2);
-				ArrayList<Element> mappings = map.get(Collections.min(map.keySet()));
-//				System.out.println(mappings.toString());
-				for (int i = 0; i < mappings.size(); i++) {
-					if (!matched.contains(mappings.get(i))) {
-						matched.add(mappings.get(i));
-						unmatched = clean(unmatched, mappings.get(i));
-					}
-				}
-				index += costMatrix.length;
-			}
-		}
-		
-//		//1st step, 1st iteration
-//		Random rand = new Random();
-//		int index = rand.nextInt(costMatrix.length);
-//		ArrayList<Element> neighbors = findElements(index, unmatched, true);
-//		//we would go through matching, but matching is none
-//		//from the directed, add the smallest edge into the matching
-//		Element minElement = min(neighbors);
-//		matched.add(minElement);
-//		unmatched.remove(minElement);
-//		
-//		System.out.println("Index: " + index);
-//		
-//		//1st step, 2nd iteration
-//		//arbitrarily pick a node thats not already in the matching
-//		while ((index = rand.nextInt(costMatrix.length)) == matched.get(0).getX()) {
-//			;
-//		}
-//		
-//		neighbors = findElements(index, unmatched, false);
-//		
-//		for (int i = 0; i < neighbors.size(); i++) {
-//			calculatePath(neighbors.get(i), unmatched, matched);
-//		}
-	
-	}
-	
-	public static ArrayList<Element> clean(ArrayList<Element> unmatched, Element ele) {
-		ArrayList<Element> cleanedUnmatched = new ArrayList<Element>(unmatched);
-		for (Element unmatchedElement : unmatched) {
-			if (unmatchedElement.getY() == ele.getY()) {
-				cleanedUnmatched.remove(unmatchedElement);
-			}
-		}
-		return cleanedUnmatched;
-	}
-	
-	public static HashMap<Integer, ArrayList<Element>> augment(int index, ArrayList<Element> matched, ArrayList<Element> unmatched) {
-		HashMap<Integer, ArrayList<Element>> iterMap = new HashMap<Integer, ArrayList<Element>>();
-		//Get neighbors of node in set A 
-		ArrayList<Element> neighbors = findElements(index, original, true);
-		for (Element ele: neighbors) {
-			if (unmatched.contains(ele)) {
-				ArrayList<Element> temp = new ArrayList<Element>();
-				temp.add(ele);
-				iterMap.put(ele.getWeight(), temp);
-			} else {
-				ArrayList<Element> matchedValue = findElements(ele.getY(), matched, false);
-				if (matchedValue.contains(ele)) {
+
+		matching = new ArrayList<Integer>();
+		finalMatching = new ArrayList<DirectedEdge>();
+
+		parseData("trip_data_test.csv", 2);
+
+		computeCostMatrix();
+
+//		int[][] costMatrix = { { 29, 57, 66, 27, 71, 33 },
+//				{ 55, 67, 80, 65, 14, 11 }, { 42, 51, 20, 94, 75, 28 },
+//				{ 82, 6, 49, 15, 22, 11 }, { 54, 46, 15, 25, 56, 89 },
+//				{ 94, 60, 99, 43, 81, 13 } };
+
+		double totalCost = 0;
+
+		EdgeWeightedDigraph original = constructDigraphFromMatrix(costMatrix);
+		int source = 0;
+
+		while (matching.size() < costMatrix.length) {
+			BellmanFordSP sp = new BellmanFordSP(original, source);
+
+			Iterator<DirectedEdge> iter = null;
+			ArrayList<DirectedEdge> bestPath = new ArrayList<DirectedEdge>();
+
+			double minPath = Integer.MAX_VALUE;
+
+			for (int v = 0 + costMatrix.length; v < original.V(); v++) {
+
+				if (matching.contains(v)) {
 					continue;
 				}
-				if (matchedValue.size() > 0) {
-					HashMap<Integer, ArrayList<Element>> prevMap = augment(matchedValue.get(0).getX(), matched, unmatched);
-					Integer minKey = Collections.min(prevMap.keySet());
-					Integer tempKey = ele.getWeight() - matchedValue.get(0).getWeight() + minKey;
-					ArrayList<Element> tempList = new ArrayList<Element>();
-					tempList.add(ele);
-					tempList.add(matchedValue.get(0));
-					tempList.addAll(prevMap.get(tempKey));
-					iterMap.put(tempKey, tempList);
+
+				if (sp.hasPathTo(v)) {
+					for (DirectedEdge e : sp.pathTo(v)) {
+						if (sp.distTo(v) < minPath) {
+							minPath = sp.distTo(v);
+							iter = sp.pathTo(v).iterator();
+						}
+					}
 				}
+			}
+
+			while (iter.hasNext()) {
+				bestPath.add(iter.next());
+			}
+
+			EdgeWeightedDigraph nextIterationGraph = new EdgeWeightedDigraph(
+					costMatrix.length + costMatrix[0].length);
+
+			for (DirectedEdge e : original.edges()) {
+				if (bestPath.contains(e)) {
+					DirectedEdge edgeToAdd = new DirectedEdge(e.to(), e.from(),
+							-1 * e.weight());
+					nextIterationGraph.addEdge(edgeToAdd);
+					if (edgeToAdd.weight() < 0) {
+						if (!matching.contains(e.to())) {
+							matching.add(e.to());
+							totalCost += e.weight();
+						}
+					}
+
+				} else {
+					nextIterationGraph.addEdge(e);
+				}
+			}
+			original = nextIterationGraph;
+			source += 1;
+		}
+
+		for (DirectedEdge edge : original.edges()) {
+			if (edge.weight() < 0) {
+				finalMatching.add(new DirectedEdge(edge.to(), edge.from(), -1
+						* edge.weight()));
 			}
 		}
 		
-		//Remove all content in the map from unmatched
-		return iterMap;
-		
+		System.out.println("Original: " + original.toString());
+		System.out.println("Digraph: " + finalMatching.toString());
+		System.out.println("TOTAL NET COST: " + totalCost);
+
 	}
-	
-//	public static void calculateAllPaths(int index, ArrayList<Element> unmatched, ArrayList<Element> matched) {
-//		ArrayList<Element> tempMatching = new ArrayList<Element>();
-//		HashMap<Integer, ArrayList<Element>> map = new HashMap<Integer, ArrayList<Element>>();
-//		
-//		
-//		//keep going until node is matched with another unmatched node
-//		while (true) {
-//			ArrayList<Element> neighbors = findElements(index, unmatched, false);
-//			
-//			for (int i = 0; i < neighbors.size(); i++) {
-//				ArrayList<Element> test = new ArrayList<Element>();
-//				test.add(neighbors.get(i));
-//				map.put(neighbors.get(i).getWeight(), test);
-//			}
-//			
-//			ArrayList<Element> matchedNeighbors = findElements(index, matched, false);
-//			
-//			
-//
-//		}
-//		
-//		
-//	}
-	
-	public static ArrayList<Element> buildElementMatrix(int [][] costMatrix) {
-		
+
+	public static ArrayList<Element> buildElementMatrix(double[][] costMatrix2) {
+
 		ArrayList<Element> elementList = new ArrayList<Element>();
-		
-		for (int i = 0; i < costMatrix.length; i++) {
-			for (int j = 0; j < costMatrix[0].length; j++) {
-				Element element = new Element(i, j, costMatrix[i][j]);
+
+		for (int i = 0; i < costMatrix2.length; i++) {
+			for (int j = 0; j < costMatrix2[0].length; j++) {
+				Element element = new Element(i, j + costMatrix2.length,
+						costMatrix2[i][j]);
 				elementList.add(element);
 			}
 		}
 		return elementList;
 	}
-	
-	public static ArrayList<Element> findElements(int toFind, ArrayList<Element> elements, boolean isX) {
 
-		ArrayList<Element> firstLevelElements = new ArrayList<Element>();
-		for (int i = 0; i < elements.size(); i++) {
-			if (isX == true) {
-				if (elements.get(i).getX() == toFind) {
-					firstLevelElements.add(elements.get(i));
+	public static EdgeWeightedDigraph constructDigraphFromMatrix(
+			double[][] costMatrix2) {
+		EdgeWeightedDigraph diGraph = new EdgeWeightedDigraph(costMatrix2.length
+				+ costMatrix2[0].length);
+		ArrayList<Element> elements = buildElementMatrix(costMatrix2);
+
+		for (Element ele : elements) {
+			DirectedEdge edge = new DirectedEdge(ele.getX(), ele.getY(),
+					ele.getWeight());
+			diGraph.addEdge(edge);
+		}
+		return diGraph;
+	}
+
+	/**
+	 * Specify the number of lines to read from the csv file (N). Max: 100 (for
+	 * now) Create an NxN matrix. N^2 loop. Read one row of taxi location and
+	 * then go through all rows of customer requests, calculating the distance
+	 * for each pair. Fill the NxN matrix across with these values Continue with
+	 * next row of taxi locations etc etc. This will construct the cost matrix
+	 * Compute the Hungarian Algorithm based on this cost matrix. (offline)
+	 */
+	private static void computeCostMatrix() {
+		for (int i = 0; i < taxis.length; i++) {
+			for (int j = 0; j < customers.length; j++) {
+				costMatrix[i][j] = Distance.haversine(taxis[i].getLatitude(),
+						taxis[i].getLongitude(), customers[j].getLatitude(),
+						customers[j].getLongitude());
+			}
+		}
+	}
+
+	private static void parseData(String filename, int maxLines) {
+
+		taxis = new UberObject[maxLines];
+		customers = new UberObject[maxLines];
+		costMatrix = new double[maxLines][maxLines];
+
+		BufferedReader br = null;
+		String line = "";
+		String cvsSplitBy = ",";
+
+		try {
+
+			br = new BufferedReader(new FileReader(filename));
+			int currentLine = -1;
+			while ((line = br.readLine()) != null && currentLine < maxLines) {
+				if (currentLine == -1) {
+					currentLine++;
+					continue;
 				}
-			} else {
-				if (elements.get(i).getY() == toFind) {
-					firstLevelElements.add(elements.get(i));
+				// use comma as separator
+				String[] data = line.split(cvsSplitBy);
+				taxis[currentLine] = new UberObject(data[11], data[10]);
+				customers[currentLine] = new UberObject(data[13], data[12]);
+
+				currentLine++;
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}
-		return firstLevelElements;
 	}
-	
-	public static boolean contains(int toFind, ArrayList<Element> elements, boolean isX) {
-		for (int i = 0; i < elements.size(); i++) {
-			if (isX == true) {
-				if (elements.get(i).getX() == toFind) {
-					return true;
-				}
-			} else {
-				if (elements.get(i).getY() == toFind) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	
-	public static Element min(ArrayList<Element> elements) {
-		Element minElement = elements.get(0);
-		for (Element ele: elements) {
-			if (ele.getWeight() < minElement.getWeight()) {
-				minElement = ele;
-			}
-		}
-		return minElement;
-	}
-	
+
 }
