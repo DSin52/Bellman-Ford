@@ -13,9 +13,10 @@ public class BellmanFord {
 	private double[][] costMatrix;
 
 	public void verifyHungarian(String filename, int nodesToRead) {
-		parseData(filename, nodesToRead);
+//		parseData(filename, nodesToRead);
 
-		computeCostMatrix();
+//		computeCostMatrix();
+		costMatrix = new SyntheticData().generateSynthetic();
 
 		HungarianAlgorithm test = new HungarianAlgorithm(costMatrix);
 
@@ -32,9 +33,11 @@ public class BellmanFord {
 
 		ArrayList<Integer> matching = new ArrayList<Integer>();
 
-		parseData(filename, nodesToRead);
-
-		computeCostMatrix();
+//		parseData(filename, nodesToRead);
+//
+//		computeCostMatrix();
+		
+		costMatrix = new SyntheticData().generateSynthetic();
 
 		double totalCost = 0;
 
@@ -45,6 +48,7 @@ public class BellmanFord {
 			cards.add(i);
 		}
 //		Collections.shuffle(cards);
+		System.out.println(cards);
 
 		int index = 0;
 
@@ -87,6 +91,8 @@ public class BellmanFord {
 					if (edgeToAdd.weight() < 0) {
 						if (!matching.contains(e.to())) {
 							matching.add(e.to());
+//							System.out.println("INDEX: " + index);
+							System.out.println("SIZE: " + matching.size());
 						}
 					}
 					totalCost += e.weight();
@@ -96,8 +102,9 @@ public class BellmanFord {
 				}
 			}
 			original = nextIterationGraph;
-
+			
 			index += 1;
+			System.out.println("INDEX: " + index);
 		}
 
 		for (DirectedEdge edge : original.edges()) {
@@ -109,21 +116,20 @@ public class BellmanFord {
 		// System.out.println("Original: " + original.toString());
 		System.out.println("Digraph: " + offlineMatching.toString());
 		double testCost = 0;
-		boolean[] testDigraph = new boolean[600];
-		for (int i = 0; i < 600; i++) {
+		boolean[] testDigraph = new boolean[500];
+		for (int i = 0; i < 500; i++) {
 			testDigraph[i] = false;
 		}
 		for (DirectedEdge test : offlineMatching) {
 			testCost += test.weight();
 			if (testDigraph[test.from()] == false && testDigraph[test.to()] == false) {
-			testDigraph[test.from()] = true;
-			testDigraph[test.to()] = true;
+				testDigraph[test.from()] = true;
+				testDigraph[test.to()] = true;
 			} else {
 				System.out.println("NO PERFECT MATCHING");
-				return;
 			}
 		}
-
+		System.out.println("LENGTH: " + matching.size());
 		System.out.println("TOTAL NET COST: " + totalCost);
 		System.out.println("TOTAL TEST COST: " + testCost);
 	}
