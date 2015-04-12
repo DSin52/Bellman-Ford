@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 public class BellmanFord {
@@ -38,9 +39,20 @@ public class BellmanFord {
 		double totalCost = 0;
 
 		EdgeWeightedDigraph original = constructDigraphFromMatrix(costMatrix);
-		int source = 0;
+
+		ArrayList<Integer> cards = new ArrayList<Integer>();
+		for (int i = 0; i < costMatrix.length; i++) {
+			cards.add(i);
+		}
+//		Collections.shuffle(cards);
+
+		int index = 0;
 
 		while (matching.size() < costMatrix.length) {
+			if (index == costMatrix.length) {
+				break;
+			}
+			int source = cards.get(index);
 			BellmanFordSP sp = new BellmanFordSP(original, source);
 
 			Iterator<DirectedEdge> iter = null;
@@ -55,11 +67,9 @@ public class BellmanFord {
 				}
 
 				if (sp.hasPathTo(v)) {
-					for (DirectedEdge e : sp.pathTo(v)) {
-						if (sp.distTo(v) < minPath) {
-							minPath = sp.distTo(v);
-							iter = sp.pathTo(v).iterator();
-						}
+					if (sp.distTo(v) < minPath) {
+						minPath = sp.distTo(v);
+						iter = sp.pathTo(v).iterator();
 					}
 				}
 			}
@@ -68,13 +78,11 @@ public class BellmanFord {
 				bestPath.add(iter.next());
 			}
 
-			EdgeWeightedDigraph nextIterationGraph = new EdgeWeightedDigraph(
-					costMatrix.length + costMatrix[0].length);
+			EdgeWeightedDigraph nextIterationGraph = new EdgeWeightedDigraph(costMatrix.length + costMatrix[0].length);
 
 			for (DirectedEdge e : original.edges()) {
 				if (bestPath.contains(e)) {
-					DirectedEdge edgeToAdd = new DirectedEdge(e.to(), e.from(),
-							-1 * e.weight());
+					DirectedEdge edgeToAdd = new DirectedEdge(e.to(), e.from(), -1 * e.weight());
 					nextIterationGraph.addEdge(edgeToAdd);
 					if (edgeToAdd.weight() < 0) {
 						if (!matching.contains(e.to())) {
@@ -88,23 +96,23 @@ public class BellmanFord {
 				}
 			}
 			original = nextIterationGraph;
-			source += 1;
+
+			index += 1;
 		}
 
 		for (DirectedEdge edge : original.edges()) {
 			if (edge.weight() < 0) {
-				offlineMatching.add(new DirectedEdge(edge.to(), edge.from(), -1
-						* edge.weight()));
+				offlineMatching.add(new DirectedEdge(edge.to(), edge.from(), -1 * edge.weight()));
 			}
 		}
 
 		// System.out.println("Original: " + original.toString());
-		// System.out.println("Digraph: " + offlineMatching.toString());
+		System.out.println("Digraph: " + offlineMatching.toString());
 		double testCost = 0;
 		for (DirectedEdge test : offlineMatching) {
 			testCost += test.weight();
 		}
-		
+
 		System.out.println("TOTAL NET COST: " + totalCost);
 		System.out.println("TOTAL TEST COST: " + testCost);
 	}
@@ -115,23 +123,19 @@ public class BellmanFord {
 
 		for (int i = 0; i < costMatrix2.length; i++) {
 			for (int j = 0; j < costMatrix2[0].length; j++) {
-				Element element = new Element(i, j + costMatrix2.length,
-						costMatrix2[i][j]);
+				Element element = new Element(i, j + costMatrix2.length, costMatrix2[i][j]);
 				elementList.add(element);
 			}
 		}
 		return elementList;
 	}
 
-	public static EdgeWeightedDigraph constructDigraphFromMatrix(
-			double[][] costMatrix2) {
-		EdgeWeightedDigraph diGraph = new EdgeWeightedDigraph(
-				costMatrix2.length + costMatrix2[0].length);
+	public static EdgeWeightedDigraph constructDigraphFromMatrix(double[][] costMatrix2) {
+		EdgeWeightedDigraph diGraph = new EdgeWeightedDigraph(costMatrix2.length + costMatrix2[0].length);
 		ArrayList<Element> elements = buildElementMatrix(costMatrix2);
 
 		for (Element ele : elements) {
-			DirectedEdge edge = new DirectedEdge(ele.getX(), ele.getY(),
-					ele.getWeight());
+			DirectedEdge edge = new DirectedEdge(ele.getX(), ele.getY(), ele.getWeight());
 			diGraph.addEdge(edge);
 		}
 		return diGraph;
@@ -148,8 +152,7 @@ public class BellmanFord {
 	private void computeCostMatrix() {
 		for (int i = 0; i < taxis.length; i++) {
 			for (int j = 0; j < customers.length; j++) {
-				costMatrix[i][j] = Distance.haversine(taxis[i].getLatitude(),
-						taxis[i].getLongitude(), customers[j].getLatitude(),
+				costMatrix[i][j] = Distance.haversine(taxis[i].getLatitude(), taxis[i].getLongitude(), customers[j].getLatitude(),
 						customers[j].getLongitude());
 			}
 		}
