@@ -4,7 +4,7 @@ import java.util.Random;
 public class SyntheticData {
 
 
-	public double[][] generateSynthetic() {
+	public double[][] generateSynthetic(int nodeSize) {
 
 		Random randSetA = new Random(2);
 		Random randSetB = new Random(4);
@@ -12,7 +12,7 @@ public class SyntheticData {
 		ArrayList<Integer> setA = new ArrayList<Integer>();
 		ArrayList<Integer> setB = new ArrayList<Integer>();
 
-		for (int i = 0; i < 500; i++) {
+		for (int i = 0; i < nodeSize; i++) {
 			while (true) {
 				int test = randSetA.nextInt(10000);
 				
@@ -35,7 +35,7 @@ public class SyntheticData {
 			}
 		}
 		
-		double[][] costMatrix = new double[500][500];
+		double[][] costMatrix = new double[nodeSize][nodeSize];
 		
 		for (int i = 0; i < costMatrix.length; i++) {
 			for (int j = 0; j < costMatrix[i].length; j++) {
