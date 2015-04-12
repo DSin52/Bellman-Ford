@@ -3,7 +3,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 
 public class BellmanFord {
@@ -47,7 +46,7 @@ public class BellmanFord {
 		for (int i = 0; i < costMatrix.length; i++) {
 			cards.add(i);
 		}
-		Collections.shuffle(cards);
+//		Collections.shuffle(cards);
 
 		int index = 0;
 
@@ -115,8 +114,8 @@ public class BellmanFord {
 		// System.out.println("Original: " + original.toString());
 		System.out.println("Digraph: " + offlineMatching.toString());
 		double testCost = 0;
-		boolean[] testDigraph = new boolean[1000];
-		for (int i = 0; i < 1000; i++) {
+		boolean[] testDigraph = new boolean[nodesToRead * 2];
+		for (int i = 0; i < testDigraph.length; i++) {
 			testDigraph[i] = false;
 		}
 		for (DirectedEdge test : offlineMatching) {
