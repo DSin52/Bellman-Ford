@@ -1,13 +1,28 @@
-
+/**
+ * Represents an object (taxi/customer) from the Uber data set.
+ */
 public class UberObject {
 
 	private String latitude;
 	private String longitude;
-	
-	public UberObject(String data, String data2) {
-		this.setLatitude(data);
-		this.setLongitude(data2);
+
+	/**
+	 * Constructor that builds a taxi or customer using their latitude/longitude
+	 * location
+	 * 
+	 * @param latitude
+	 *            Latitude coordinate of taxi/customer
+	 * @param longitude
+	 *            Longitude coordinate of taxi/customer
+	 */
+	public UberObject(String latitude, String longitude) {
+		this.setLatitude(latitude);
+		this.setLongitude(longitude);
 	}
+
+	/**
+	 * Getters and Setters
+	 */
 
 	public String getLatitude() {
 		return latitude;

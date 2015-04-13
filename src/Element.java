@@ -1,23 +1,38 @@
-
-
+/**
+ * An Element represents an Edge in the graph.
+ */
 public class Element {
 
 	private int x;
 	private int y;
 	private double weight;
-	
-	public Element(int x, int y, double costMatrix2) {
+
+	/**
+	 * Creates a new element
+	 * 
+	 * @param x
+	 *            Index of edge in Set A
+	 * @param y
+	 *            Index of edge in Set B
+	 * @param weight
+	 *            Weight/Cost of edge
+	 */
+	public Element(int x, int y, double weight) {
 		this.setX(x);
 		this.setY(y);
-		this.setWeight(costMatrix2);
+		this.setWeight(weight);
 	}
+
+	/**
+	 * Getters and Setters
+	 */
 
 	public double getWeight() {
 		return weight;
 	}
 
-	public void setWeight(double costMatrix2) {
-		this.weight = costMatrix2;
+	public void setWeight(double weight) {
+		this.weight = weight;
 	}
 
 	public int getY() {
@@ -35,9 +50,13 @@ public class Element {
 	public void setX(int x) {
 		this.x = x;
 	}
-	
+
+	/**
+	 * Returns a string representation of an Element
+	 */
 	public String toString() {
-		return this.getWeight() + ": (" + this.getX() + ", " + this.getY() + ")";
+		return this.getWeight() + ": (" + this.getX() + ", " + this.getY()
+				+ ")";
 	}
 
 }

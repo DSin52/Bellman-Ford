@@ -1,9 +1,18 @@
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Generates random synthetic 1-D data and the associated cost matrix.
+ */
 public class SyntheticData {
 
-
+	/**
+	 * Generates the synthetic data and creates a cost matrix.
+	 * 
+	 * @param nodeSize
+	 *            Number of total vertices in the synthetic data.
+	 * @return Cost matrix of the data
+	 */
 	public double[][] generateSynthetic(int nodeSize) {
 
 		Random randSetA = new Random(2);
@@ -15,7 +24,7 @@ public class SyntheticData {
 		for (int i = 0; i < nodeSize; i++) {
 			while (true) {
 				int test = randSetA.nextInt(10000);
-				
+
 				if (!setA.contains(test)) {
 					setA.add(test);
 				} else {
@@ -25,7 +34,7 @@ public class SyntheticData {
 			}
 			while (true) {
 				int test2 = randSetB.nextInt(10000);
-				
+
 				if (!setB.contains(test2)) {
 					setB.add(test2);
 				} else {
@@ -34,9 +43,9 @@ public class SyntheticData {
 				break;
 			}
 		}
-		
+
 		double[][] costMatrix = new double[nodeSize][nodeSize];
-		
+
 		for (int i = 0; i < costMatrix.length; i++) {
 			for (int j = 0; j < costMatrix[i].length; j++) {
 				costMatrix[i][j] = Math.abs(setA.get(i) - setB.get(j));
