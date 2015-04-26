@@ -270,7 +270,7 @@ public class BellmanFord {
 		original = constructDigraphFromMatrix(costMatrix);
 
 		// Randomizes the source node indices chosen for augmentation
-//		Collections.shuffle(sourceIndices);
+		Collections.shuffle(sourceIndices);
 		
 		System.out.println("Source Order: " + sourceIndices.toString());
 
@@ -370,7 +370,15 @@ public class BellmanFord {
 						}
 					}
 				} else {
-					DirectedEdge constantEdge = new DirectedEdge(e.from(),
+					DirectedEdge constantEdge = null;
+//					if (e.weight() >= 0.0) {
+//						constantEdge = new DirectedEdge(e.from(),
+//								e.to(), 3.0 * e.weight());
+//					} else {
+//						constantEdge = new DirectedEdge(e.from(),
+//								e.to(), e.weight());
+//					}
+					constantEdge = new DirectedEdge(e.from(),
 							e.to(), e.weight());
 					nextIterationGraph.addEdge(constantEdge);
 				}
