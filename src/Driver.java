@@ -20,7 +20,7 @@ public class Driver {
 	public static void main(String[] args) {
 		int numNodes = 10;
 		String filename = "trip_data_test.csv";
-		// filename = "synthetic";
+		filename = "synthetic";
 
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
@@ -28,7 +28,10 @@ public class Driver {
 
 		System.out.println("BELLMAN");
 		BellmanFord bell = new BellmanFord();
-		bell.computeOfflineMatching(filename, numNodes);
+		double offlineCost = bell.computeOfflineMatching(filename, numNodes);
+		double onlineCost = bell.computeOnlineMatching(filename, numNodes);
+		double competetiveRatio = onlineCost / offlineCost;
+		System.out.println("Competetive Ratio: " + competetiveRatio);
 
 		System.out.println("\nHUNGARIAN");
 		bell.verifyHungarian(filename, numNodes);
