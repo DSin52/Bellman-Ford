@@ -28,7 +28,7 @@ public class BellmanFord {
 	 */
 	public void verifyHungarian(String filename, int nodesToRead) {
 		if (filename.equals("synthetic")) {
-			costMatrix = new SyntheticData().generateExample(nodesToRead);
+			costMatrix = new SyntheticData().generateSynthetic(nodesToRead);
 		} else {
 			parseData(filename, nodesToRead);
 
@@ -54,7 +54,7 @@ public class BellmanFord {
 	 * @param nodesToRead
 	 *            Number of nodes/vertices in Set A.
 	 */
-	public void computeOfflineMatching(String filename, int numSetA) {
+	public double computeOfflineMatching(String filename, int numSetA) {
 		// Final offline matching ArrayList of directed edges
 		ArrayList<DirectedEdge> offlineMatching = new ArrayList<DirectedEdge>();
 
@@ -211,8 +211,11 @@ public class BellmanFord {
 
 		// System.out.println("LENGTH: " + matching.size());
 		// System.out.println("TOTAL NET COST: " + totalCost);
+		double totalCost = calculateTotalCost(offlineMatching);
 		System.out.println("TOTAL TEST COST: "
-				+ calculateTotalCost(offlineMatching));
+				+ totalCost);
+		
+		return totalCost;
 	}
 
 	/**
@@ -273,7 +276,7 @@ public class BellmanFord {
 		return tempMatrix;
 	}
 
-	public void computeOnlineMatching(String filename, int numSetA) {
+	public double computeOnlineMatching(String filename, int numSetA) {
 		// Final offline matching ArrayList of directed edges
 		ArrayList<DirectedEdge> offlineMatching = new ArrayList<DirectedEdge>();
 		ArrayList<DirectedEdge> onlineMatching = new ArrayList<DirectedEdge>();
@@ -294,7 +297,7 @@ public class BellmanFord {
 		boolean runNegativeCycleIndices = false;
 
 		if (filename.equals("synthetic")) {
-			costMatrix = new SyntheticData().generateExample(numSetA);
+			costMatrix = new SyntheticData().generateSynthetic(numSetA);
 		} else {
 			parseData(filename, numSetA);
 
@@ -314,7 +317,7 @@ public class BellmanFord {
 		original = constructDigraphFromMatrix(costMatrix);
 
 		// Randomizes the source node indices chosen for augmentation
-		// Collections.shuffle(sourceIndices);
+		Collections.shuffle(sourceIndices);
 
 		/*
 		 * Core of the algorithm
@@ -348,12 +351,6 @@ public class BellmanFord {
 			}
 			
 			tempMatrix = normalizeMatrix(index, tempMatrix);
-//			for (int i = 0; i < tempMatrix.length; i++) {
-//				for (int j = 0; j < tempMatrix[i].length; j++) {
-//					System.out.print(tempMatrix[i][j] + ", ");
-//				}
-//			}
-		
 
 			int source = sourceIndices.get(index);
 			int destination = -1;
@@ -407,7 +404,7 @@ public class BellmanFord {
 
 			// Update matchings and new DiGraph
 			for (DirectedEdge e : original.edges()) {
-				if (bestPath.contains(e)) {
+				if (containsEdge(bestPath, e)) {
 					DirectedEdge edgeToAdd = new DirectedEdge(e.to(), e.from(),
 							-1.0 * e.weight());
 					nextIterationGraph.addEdge(edgeToAdd);
@@ -422,7 +419,8 @@ public class BellmanFord {
 					// totalCost += e.weight();
 
 				} else {
-					nextIterationGraph.addEdge(e);
+					DirectedEdge constantEdge = new DirectedEdge(e.from(), e.to(), e.weight());
+					nextIterationGraph.addEdge(constantEdge);
 				}
 			}
 
@@ -452,8 +450,20 @@ public class BellmanFord {
 
 		System.out.println("Matching: " + matching.toString());
 		// System.out.println("TOTAL NET COST: " + totalCost);
+		double totalCost = calculateTotalCost(onlineMatching); 
 		System.out.println("TOTAL TEST COST: "
-				+ calculateTotalCost(offlineMatching));
+				+ totalCost);
+		return totalCost;
+	}
+	
+	public boolean containsEdge(ArrayList<DirectedEdge> list, DirectedEdge edge) {
+		for (DirectedEdge e: list) {
+			if(e.to() == edge.to() && e.from() == edge.from() && e.weight() == edge.weight()) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	/**
