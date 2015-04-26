@@ -28,7 +28,7 @@ public class BellmanFord {
 	 */
 	public void verifyHungarian(String filename, int nodesToRead) {
 		if (filename.equals("synthetic")) {
-			costMatrix = new SyntheticData().generateSynthetic(nodesToRead);
+			costMatrix = new SyntheticData().generateExample(nodesToRead);
 		} else {
 			parseData(filename, nodesToRead);
 
@@ -249,6 +249,211 @@ public class BellmanFord {
 			}
 		}
 		return elementList;
+	}
+
+	private double[][] generateInitialMatrix() {
+		double[][] tempMatrix = new double[costMatrix.length][costMatrix.length];
+
+		for (int i = 0; i < tempMatrix.length; i++) {
+			for (int j = 0; j < tempMatrix[i].length; j++) {
+				tempMatrix[i][j] = 10000.0;
+			}
+		}
+		return tempMatrix;
+	}
+
+	private double[][] normalizeMatrix(int column, double[][] tempMatrix) {
+		for (int i = 0; i < tempMatrix.length; i++) {
+			for (int j = 0; j < tempMatrix[i].length; j++) {
+				if (tempMatrix[i][j] == 10000.0 && j == column) {
+					tempMatrix[i][j] = costMatrix[i][j];
+				}
+			}
+		}
+		return tempMatrix;
+	}
+
+	public void computeOnlineMatching(String filename, int numSetA) {
+		// Final offline matching ArrayList of directed edges
+		ArrayList<DirectedEdge> offlineMatching = new ArrayList<DirectedEdge>();
+		ArrayList<DirectedEdge> onlineMatching = new ArrayList<DirectedEdge>();
+
+		// Temporary matching ArrayList of Set B values for internal management
+		ArrayList<Integer> matching = new ArrayList<Integer>();
+
+		// ArrayList that stores all negative cycle indices for repeated
+		// processing
+		ArrayList<Integer> negativeCycleIndex = new ArrayList<Integer>();
+
+		// Index of the current source node being processed
+		int index = 0;
+
+		// double totalCost = 0;
+
+		// Boolean value that is set to true
+		boolean runNegativeCycleIndices = false;
+
+		if (filename.equals("synthetic")) {
+			costMatrix = new SyntheticData().generateExample(numSetA);
+		} else {
+			parseData(filename, numSetA);
+
+			computeCostMatrix();
+		}
+
+		ArrayList<Integer> sourceIndices = new ArrayList<Integer>();
+		for (int i = 0; i < numSetA; i++) {
+			sourceIndices.add(i);
+		}
+
+		double[][] tempMatrix = generateInitialMatrix();
+		
+		EdgeWeightedDigraph original = null;
+		
+		// Construct a DiGraph from the original costmatrix
+		original = constructDigraphFromMatrix(costMatrix);
+
+		// Randomizes the source node indices chosen for augmentation
+		// Collections.shuffle(sourceIndices);
+
+		/*
+		 * Core of the algorithm
+		 * 
+		 * Algorithm repeats until matching is perfect. Source node index is
+		 * picked and BellmanFord is ran on that node. This computes all the
+		 * paths and their costs from the source node to every target node. All
+		 * paths are processed to choose the minimum cost and to also check for
+		 * negative cycles. If a negative cycle occurs on the node, then add it
+		 * to the negativeCycleIndex ArrayList and move on to the next source
+		 * node. Else, the minimum cost path is chosen. The best path is added
+		 * to an ArrayList bestPath and a new DiGraph is constructed with the
+		 * best cost matching and the previous matchings. This new edge matching
+		 * is added to the matchings ArrayList and the original DiGraph is
+		 * updated with this new DiGraph. The process is repeated.
+		 * 
+		 * If negative cycles occurred during the processing, an additional
+		 * iteration over the negativeCycleIndex ArrayList is ran to process
+		 * these indices and find their proper matchings.
+		 */
+		while (matching.size() < numSetA) {
+
+			if (index == numSetA) { // Last source index to process?
+				if (negativeCycleIndex.size() > 0) { // Negative cycles to
+					// process?
+					index = negativeCycleIndex.remove(0);
+					runNegativeCycleIndices = true;
+				} else {
+					break; // All processing complete
+				}
+			}
+			
+			tempMatrix = normalizeMatrix(index, tempMatrix);
+//			for (int i = 0; i < tempMatrix.length; i++) {
+//				for (int j = 0; j < tempMatrix[i].length; j++) {
+//					System.out.print(tempMatrix[i][j] + ", ");
+//				}
+//			}
+		
+
+			int source = sourceIndices.get(index);
+			int destination = -1;
+			// Run BellmanFord algorithm on source index
+			BellmanFordSP sp = new BellmanFordSP(constructDigraphFromMatrix(tempMatrix), source);
+
+			Iterator<DirectedEdge> iter = null;
+			ArrayList<DirectedEdge> bestPath = new ArrayList<DirectedEdge>();
+
+			double minPath = Double.MAX_VALUE;
+
+			// Obtain minimum cost path
+			for (int v = numSetA; v < original.V(); v++) {
+
+				if (matching.contains(v)) {
+					continue;
+				}
+
+				if (sp.hasNegativeCycle()) {
+					negativeCycleIndex.add(index);
+					index++;
+					break;
+				}
+
+				if (sp.hasPathTo(v)) {
+					if (sp.distTo(v) < minPath) {
+						minPath = sp.distTo(v);
+						iter = sp.pathTo(v).iterator();
+						destination = v;
+					}
+				}
+			}
+
+			System.out.println("Destination: " + destination);
+
+			// Negative cycle detected, don't process current index
+			if (iter == null) {
+				if (runNegativeCycleIndices) {
+					index = numSetA;
+				}
+				continue;
+			}
+
+			while (iter.hasNext()) {
+				bestPath.add(iter.next());
+			}
+
+			// New iteration DiGraph that will have updated edges
+			EdgeWeightedDigraph nextIterationGraph = new EdgeWeightedDigraph(
+					numSetA + costMatrix[0].length);
+
+			// Update matchings and new DiGraph
+			for (DirectedEdge e : original.edges()) {
+				if (bestPath.contains(e)) {
+					DirectedEdge edgeToAdd = new DirectedEdge(e.to(), e.from(),
+							-1.0 * e.weight());
+					nextIterationGraph.addEdge(edgeToAdd);
+					if (edgeToAdd.weight() <= 0) {
+						if (!matching.contains(e.to())) {
+							matching.add(e.to());
+							onlineMatching.add(new DirectedEdge(source,
+									destination, e.weight()));
+							System.out.println("Source: " + source);
+						}
+					}
+					// totalCost += e.weight();
+
+				} else {
+					nextIterationGraph.addEdge(e);
+				}
+			}
+
+			original = nextIterationGraph;
+
+			// Increment index if not processing negative cycles, else set index
+			// to last source node
+			if (!runNegativeCycleIndices) {
+				index++;
+			} else {
+				index = numSetA;
+			}
+		}
+
+		// Add all matched edges to offline matching with proper weight
+		for (DirectedEdge edge : original.edges()) {
+			if (edge.weight() < 0) {
+				offlineMatching.add(new DirectedEdge(edge.to(), edge.from(),
+						-1.0 * edge.weight()));
+			}
+		}
+
+		System.out.println("Offline Matching Digraph: "
+				+ offlineMatching.toString());
+		System.out.println("Online Matching Digraph: "
+				+ onlineMatching.toString());
+
+		System.out.println("Matching: " + matching.toString());
+		// System.out.println("TOTAL NET COST: " + totalCost);
+		System.out.println("TOTAL TEST COST: "
+				+ calculateTotalCost(offlineMatching));
 	}
 
 	/**

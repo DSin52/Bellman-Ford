@@ -54,4 +54,7 @@ public class SyntheticData {
 		return costMatrix;
 	}
 
+	public double[][] generateExample(int nodeSize) {
+		return new double[][]{{5, 1, 7}, {13, 1, 2}, {6, 1, 9}};
+	}
 }

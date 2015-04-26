@@ -18,9 +18,9 @@ public class Driver {
 	 *            dataset.
 	 */
 	public static void main(String[] args) {
-		int numNodes = 10;
+		int numNodes = 3;
 		String filename = "trip_data_test.csv";
-		// filename = "synthetic";
+		filename = "synthetic";
 
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
@@ -28,7 +28,7 @@ public class Driver {
 
 		System.out.println("BELLMAN");
 		BellmanFord bell = new BellmanFord();
-		bell.computeOfflineMatching(filename, numNodes);
+		bell.computeOnlineMatching(filename, numNodes);
 
 		System.out.println("\nHUNGARIAN");
 		bell.verifyHungarian(filename, numNodes);
