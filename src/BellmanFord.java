@@ -12,6 +12,8 @@ import java.util.Iterator;
  * 
  */
 public class BellmanFord {
+	
+	private double constant = 1.0;
 
 	private UberObject[] taxis; // Set A
 	private UberObject[] customers; // Set B
@@ -239,6 +241,8 @@ public class BellmanFord {
 	public double computeOnlineMatching(String filename, int numSetA) {
 		// Final online matching ArrayList of directed edges
 		ArrayList<DirectedEdge> onlineMatching = new ArrayList<DirectedEdge>();
+		
+		ArrayList<DirectedEdge> testMatching = new ArrayList<DirectedEdge>();
 
 		// Temporary matching ArrayList of Set B values for internal management
 		ArrayList<Integer> matching = new ArrayList<Integer>();
@@ -368,21 +372,37 @@ public class BellmanFord {
 			for (DirectedEdge e : original.edges()) {
 				// If this edge is part of the matching
 				if (containsEdge(bestPath, e)) {
-					DirectedEdge edgeToAdd = new DirectedEdge(e.to(), e.from(),
-							-1.0 * e.weight());
+					DirectedEdge edgeToAdd = null;
+					if (e.weight() < 0.0) {
+						edgeToAdd = new DirectedEdge(e.to(), e.from(),
+								-1.0 * e.weight());
+					} else {
+						edgeToAdd = new DirectedEdge(e.to(), e.from(),
+								(-1.0 * e.weight())/constant);
+					}
+//					DirectedEdge edgeToAdd = new DirectedEdge(e.to(), e.from(),
+//							(-1.0 * e.weight())/3.0);
 					nextIterationGraph.addEdge(edgeToAdd);
 					if (edgeToAdd.weight() <= 0) {
 						if (!matching.contains(e.to())) {
 							matching.add(e.to());
-							onlineMatching.add(new DirectedEdge(source,
-									destination, e.weight()));
+//							onlineMatching.add(new DirectedEdge(source,
+//									destination, e.weight() / 3.0));
+							onlineMatching.add(edgeToAdd);
 						}
 					}
 				} else {
 					DirectedEdge constantEdge = null;
 					if (e.weight() >= 0.0) {
-						constantEdge = new DirectedEdge(e.from(), e.to(),
-								3.0 * e.weight());
+//						if (!containsEdge(testMatching, e)) {
+//							constantEdge = new DirectedEdge(e.from(), e.to(),
+//									3.0 * e.weight());
+//							testMatching.add(constantEdge);
+//						} else {
+							constantEdge = new DirectedEdge(e.from(), e.to(),
+									1.0 * e.weight());
+//						}
+						
 					} else {
 						constantEdge = new DirectedEdge(e.from(), e.to(),
 								e.weight());
@@ -566,7 +586,7 @@ public class BellmanFord {
 	public double calculateTotalCost(ArrayList<DirectedEdge> matching) {
 		double testCost = 0;
 		for (DirectedEdge test : matching) {
-			testCost += test.weight();
+			testCost += Math.abs(test.weight());
 		}
 		return testCost;
 	}
@@ -607,7 +627,7 @@ public class BellmanFord {
 		for (int i = 0; i < tempMatrix.length; i++) {
 			for (int j = 0; j < tempMatrix[i].length; j++) {
 				if (/* tempMatrix[i][j] == 100000.0 && */j == column) {
-					tempMatrix[i][j] = costMatrix[i][j];
+					tempMatrix[i][j] = constant * costMatrix[i][j];
 				}
 			}
 		}
