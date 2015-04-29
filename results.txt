@@ -1,0 +1,163 @@
+SYNTHETIC 1D (3.0 constant)
+Offline Matching Digraph: [7->19 1292.00, 0->18 354.00, 8->17  1.00, 4->16 478.00, 1->15 1267.00, 2->14 273.00, 9->13 490.00, 6->12 1303.00, 3->11 3615.00, 5->10 1488.00]
+TOTAL OFFLINE COST: 10561.0
+Destination Order: [14, 15, 19, 16, 13, 12, 10, 17, 11, 18]
+Online Digraph: [14->2 273.00, 15->1 1267.00, 19->4 38.00, 16->7 1808.00, 13->9 490.00, 12->5 47.00, 10->6 2744.00, 17->8  1.00, 11->3 3615.00, 18->0 354.00]
+TOTAL ONLINE NET COST: 10637.0
+TOTAL GREEDY NET COST: 13535.0
+Competetive Ratio between online and offline: 1.0071962882302812
+Competetive Ratio between greedy online and offline: 1.2816021210112678
+
+Offline Matching Digraph: [7->19 1292.00, 0->18 354.00, 8->17  1.00, 4->16 478.00, 1->15 1267.00, 2->14 273.00, 9->13 490.00, 3->12 1764.00, 5->11 1898.00, 6->10 2744.00]
+TOTAL OFFLINE COST: 10561.0
+Destination Order: [10, 15, 11, 13, 19, 16, 18, 14, 12, 17]
+Online Digraph: [10->1 490.00, 15->5 3245.00, 11->2 2588.00, 13->9 490.00, 19->4 38.00, 16->7 1808.00, 18->0 354.00, 14->6 839.00, 12->3 1764.00, 17->8  1.00]
+TOTAL ONLINE NET COST: 11617.0
+TOTAL GREEDY NET COST: 17305.0
+Competetive Ratio between online and offline: 1.099990531199697
+Competetive Ratio between greedy online and offline: 1.6385758924344285
+
+Offline Matching Digraph: [7->19 1292.00, 0->18 354.00, 8->17  1.00, 4->16 478.00, 1->15 1267.00, 2->14 273.00, 9->13 490.00, 6->12 1303.00, 3->11 3615.00, 5->10 1488.00]
+TOTAL OFFLINE COST: 10561.0
+Destination Order: [11, 17, 12, 10, 15, 19, 16, 13, 18, 14]
+Online Digraph: [11->1 80.00, 17->8  1.00, 12->5 47.00, 10->2 2178.00, 15->6 4501.00, 19->4 38.00, 16->7 1808.00, 13->9 490.00, 18->0 354.00, 14->3 1300.00]
+TOTAL ONLINE NET COST: 10797.0
+TOTAL GREEDY NET COST: 16485.0
+Competitive Ratio between online and offline: 1.0223463687150838
+Competitive Ratio between greedy online and offline: 1.5609317299498153
+
+=============================================================================================================================================================================
+SYNTHETIC 2D (3.0 constant)
+Offline Matching Digraph: [9->19  0.30, 8->18  0.25, 4->17  0.12, 6->16  0.37, 3->15  0.09, 5->14  0.26, 2->13  0.14, 1->12  0.15, 0->11  0.38, 7->10  0.10]
+TOTAL OFFLINE COST: 2.1653803985558997
+Destination Order: [14, 17, 10, 19, 12, 18, 11, 13, 15, 16]
+Online Digraph: [14->5  0.26, 17->4  0.12, 10->7  0.10, 19->3  0.22, 12->1  0.15, 18->9  0.14, 11->0  0.38, 13->2  0.14, 15->6  0.61, 16->8  0.58]
+TOTAL ONLINE NET COST: 2.6913314911682846
+TOTAL GREEDY NET COST: 2.444667606361319
+Competitive Ratio between online and offline: 1.2428908532482994
+Competitive Ratio between greedy online and offline: 1.1289783577941672
+
+Offline Matching Digraph: [9->19  0.30, 8->18  0.25, 4->17  0.12, 6->16  0.37, 3->15  0.09, 5->14  0.26, 2->13  0.14, 1->12  0.15, 0->11  0.38, 7->10  0.10]
+TOTAL OFFLINE COST: 2.1653803985558997
+Destination Order: [18, 16, 14, 13, 15, 12, 10, 17, 11, 19]
+Online Digraph: [18->9  0.14, 16->5  0.21, 14->4  0.35, 13->2  0.14, 15->3  0.09, 12->1  0.15, 10->7  0.10, 17->0  0.20, 11->8  0.83, 19->6  0.40]
+TOTAL ONLINE NET COST: 2.610412106427592
+TOTAL GREEDY NET COST: 2.5230960441460573
+Competitive Ratio between online and offline: 1.2055212599913094
+Competitive Ratio between greedy online and offline: 1.165197600305572
+
+METRIC or not?
+
+=============================================================================================================================================================================
+UBER/TAXI 2D (3.0 constant)
+
+Offline Matching Digraph: [9->19  3.01, 8->18  0.90, 5->17  8.58, 2->16  0.77, 4->15  0.80, 6->14  0.72, 3->13  0.86, 1->12  0.70, 7->11  0.78, 0->10  1.24]
+TOTAL OFFLINE COST: 18.338093892381316
+Destination Order: [11, 13, 14, 15, 10, 17, 19, 16, 12, 18]
+Online Digraph: [11->6  0.75, 13->7  0.53, 14->2  1.14, 15->8  0.28, 10->0  1.24, 17->5  8.58, 19->9  3.01, 16->1  1.40, 12->4  3.78, 18->3  2.82]
+TOTAL ONLINE NET COST: 23.525038422373125
+TOTAL GREEDY NET COST: 24.132273831463614
+Competitive Ratio between online and offline: 1.2828508001121512
+Competitive Ratio between greedy online and offline: 1.3159641330819845
+
+Offline Matching Digraph: [9->19  3.01, 8->18  0.90, 5->17  8.58, 2->16  0.77, 4->15  0.80, 6->14  0.72, 3->13  0.86, 1->12  0.70, 7->11  0.78, 0->10  1.24]
+TOTAL OFFLINE COST: 18.338093892381316
+Destination Order: [15, 13, 18, 12, 14, 19, 11, 10, 17, 16]
+Online Digraph: [15->8  0.28, 13->7  0.53, 18->6  1.46, 12->1  0.70, 14->2  1.14, 19->9  3.01, 11->0  1.60, 10->4  1.18, 17->5  8.58, 16->3  3.26]
+TOTAL ONLINE NET COST: 21.737224739864942
+TOTAL GREEDY NET COST: 21.75325848511787
+Competitive Ratio between online and offline: 1.1853590055450538
+Competitive Ratio between greedy online and offline: 1.186233346430591
+
+Offline Matching Digraph: [9->19  3.01, 8->18  0.90, 5->17  8.58, 2->16  0.77, 4->15  0.80, 6->14  0.72, 3->13  0.86, 1->12  0.70, 7->11  0.78, 0->10  1.24]
+TOTAL OFFLINE COST: 18.338093892381316
+Destination Order: [12, 14, 13, 15, 11, 17, 16, 19, 18, 10]
+Online Digraph: [12->1  0.70, 14->6  0.72, 13->7  0.53, 15->8  0.28, 11->0  1.60, 17->5  8.58, 16->2  0.77, 19->9  3.01, 18->4  1.56, 10->3  1.61]
+TOTAL ONLINE NET COST: 19.351357438595326
+TOTAL GREEDY NET COST: 20.29026601209728
+Competitive Ratio between online and offline: 1.0552545729212879
+Competitive Ratio between greedy online and offline: 1.1064544729224561
+
+Offline Matching Digraph: [9->19  3.01, 8->18  0.90, 5->17  8.58, 2->16  0.77, 4->15  0.80, 6->14  0.72, 3->13  0.86, 1->12  0.70, 7->11  0.78, 0->10  1.24]
+TOTAL OFFLINE COST: 18.338093892381316
+Destination Order: [19, 12, 13, 17, 14, 10, 15, 16, 11, 18]
+Online Digraph: [19->9  3.01, 12->1  0.70, 13->7  0.53, 17->5  8.58, 14->6  0.72, 10->0  1.24, 15->8  0.28, 16->2  0.77, 11->4  1.56, 18->3  2.82]
+TOTAL ONLINE NET COST: 20.192805150204084
+TOTAL GREEDY NET COST: 20.176771404951158
+Competitive Ratio between online and offline: 1.1011398059529687
+Competitive Ratio between greedy online and offline: 1.1002654650674317
+
+Offline Matching Digraph: [9->19  3.01, 8->18  0.90, 5->17  8.58, 2->16  0.77, 4->15  0.80, 6->14  0.72, 3->13  0.86, 1->12  0.70, 7->11  0.78, 0->10  1.24]
+TOTAL OFFLINE COST: 18.338093892381316
+Destination Order: [13, 10, 12, 14, 15, 16, 19, 17, 18, 11]
+Online Digraph: [13->7  0.53, 10->6  0.94, 12->1  0.70, 14->2  1.14, 15->8  0.28, 16->0  2.89, 19->9  3.01, 17->5  8.58, 18->4  1.56, 11->3  1.97]
+TOTAL ONLINE NET COST: 21.601650924180475
+TOTAL GREEDY NET COST: 22.356922571684425
+Competitive Ratio between online and offline: 1.1779659898652295
+Competitive Ratio between greedy online and offline: 1.2191519305598473
+
+=============================================================================================================================================================================
+UBER/TAXI 2D (1.0 constant)
+
+Offline Matching Digraph: [9->19  3.01, 8->18  0.90, 5->17  8.58, 2->16  0.77, 4->15  0.80, 6->14  0.72, 3->13  0.86, 1->12  0.70, 7->11  0.78, 0->10  1.24]
+TOTAL OFFLINE COST: 18.338093892381316
+Destination Order: [11, 13, 14, 15, 10, 17, 19, 16, 12, 18]
+Online Digraph: [11->6  0.75, 13->7  0.53, 14->0  2.34, 15->8  0.28, 10->2  1.95, 17->5  8.58, 19->9  3.01, 16->4  2.67, 12->1  0.70, 18->3  2.82]
+TOTAL ONLINE NET COST: 23.622696549845166
+TOTAL GREEDY NET COST: 24.132273831463614
+Competitive Ratio between online and offline: 1.2881762242290282
+Competitive Ratio between greedy online and offline: 1.3159641330819845
+
+Offline Matching Digraph: [9->19  3.01, 8->18  0.90, 5->17  8.58, 2->16  0.77, 4->15  0.80, 6->14  0.72, 3->13  0.86, 1->12  0.70, 7->11  0.78, 0->10  1.24]
+TOTAL OFFLINE COST: 18.338093892381316
+Destination Order: [15, 13, 18, 12, 14, 19, 11, 10, 17, 16]
+Online Digraph: [15->8  0.28, 13->7  0.53, 18->4  1.56, 12->1  0.70, 14->6  0.72, 19->9  3.01, 11->0  1.60, 10->2  1.95, 17->5  8.58, 16->3  3.26]
+TOTAL ONLINE NET COST: 22.18368214889098
+TOTAL GREEDY NET COST: 21.75325848511787
+Competitive Ratio between online and offline: 1.2097049060321008
+Competitive Ratio between greedy online and offline: 1.186233346430591
+
+Offline Matching Digraph: [9->19  3.01, 8->18  0.90, 5->17  8.58, 2->16  0.77, 4->15  0.80, 6->14  0.72, 3->13  0.86, 1->12  0.70, 7->11  0.78, 0->10  1.24]
+TOTAL OFFLINE COST: 18.338093892381316
+Destination Order: [12, 14, 13, 15, 11, 17, 16, 19, 18, 10]
+Online Digraph: [12->1  0.70, 14->6  0.72, 13->7  0.53, 15->8  0.28, 11->0  1.60, 17->5  8.58, 16->2  0.77, 19->9  3.01, 18->4  1.56, 10->3  1.61]
+TOTAL ONLINE NET COST: 19.351357438595326
+TOTAL GREEDY NET COST: 20.29026601209728
+Competitive Ratio between online and offline: 1.0552545729212879
+Competitive Ratio between greedy online and offline: 1.1064544729224561
+
+Offline Matching Digraph: [9->19  3.01, 8->18  0.90, 5->17  8.58, 2->16  0.77, 4->15  0.80, 6->14  0.72, 3->13  0.86, 1->12  0.70, 7->11  0.78, 0->10  1.24]
+TOTAL OFFLINE COST: 18.338093892381316
+Destination Order: [19, 12, 13, 17, 14, 10, 15, 16, 11, 18]
+Online Digraph: [19->9  3.01, 12->1  0.70, 13->7  0.53, 17->5  8.58, 14->6  0.72, 10->0  1.24, 15->8  0.28, 16->2  0.77, 11->4  1.56, 18->3  2.82]
+TOTAL ONLINE NET COST: 20.192805150204084
+TOTAL GREEDY NET COST: 20.176771404951158
+Competitive Ratio between online and offline: 1.1011398059529687
+Competitive Ratio between greedy online and offline: 1.1002654650674317
+
+Offline Matching Digraph: [9->19  3.01, 8->18  0.90, 5->17  8.58, 2->16  0.77, 4->15  0.80, 6->14  0.72, 3->13  0.86, 1->12  0.70, 7->11  0.78, 0->10  1.24]
+TOTAL OFFLINE COST: 18.338093892381316
+Destination Order: [13, 10, 12, 14, 15, 16, 19, 17, 18, 11]
+Online Digraph: [13->7  0.53, 10->0  1.24, 12->1  0.70, 14->6  0.72, 15->8  0.28, 16->2  0.77, 19->9  3.01, 17->5  8.58, 18->4  1.56, 11->3  1.97]
+TOTAL ONLINE NET COST: 19.350060915884388
+TOTAL GREEDY NET COST: 22.356922571684425
+Competitive Ratio between online and offline: 1.055183871859414
+Competitive Ratio between greedy online and offline: 1.2191519305598473
+
+=============================================================================================================================================================================
+UBER/TAXI 2D (1.0 constant) 350
+
+TOTAL OFFLINE COST: 416.7027430478577
+TOTAL ONLINE NET COST: 577.5294962810035
+TOTAL GREEDY NET COST: 527.763608219529
+Competitive Ratio between online and offline: 1.385950790860705
+Competitive Ratio between greedy online and offline: 1.2665229999671879
+
+=============================================================================================================================================================================
+UBER/TAXI 2D (3.0 constant) 350
+
+TOTAL OFFLINE COST: 416.7027430478577
+TOTAL ONLINE NET COST: 528.1289579548984
+TOTAL GREEDY NET COST: 527.763608219529
+Competitive Ratio between online and offline: 1.2673997634189884
+Competitive Ratio between greedy online and offline: 1.2665229999671879
