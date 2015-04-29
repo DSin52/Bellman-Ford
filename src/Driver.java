@@ -21,7 +21,7 @@ public class Driver {
 		int numNodes = 3;
 		String filename = "trip_data_test.csv";
 		filename = "synthetic";
-//		filename = "example";
+		filename = "example";
 
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
@@ -31,11 +31,11 @@ public class Driver {
 		BellmanFord bell = new BellmanFord();
 		double offlineCost = bell.execute(filename, numNodes, "offline");
 		double onlineCost = bell.execute(filename, numNodes, "online");
-//		double onlineGreedyCost = bell.execute(filename, numNodes, "greedy");
+		double onlineGreedyCost = bell.execute(filename, numNodes, "greedy");
 		double competetiveRatio = onlineCost / offlineCost;
-//		double competetiveRatio1 = onlineGreedyCost / offlineCost;
+		double competetiveRatio1 = onlineGreedyCost / offlineCost;
 		System.out.println("Competetive Ratio between online and offline: " + competetiveRatio);
-//		System.out.println("Competetive Ratio between greedy online and offline: " + competetiveRatio1);
+		System.out.println("Competetive Ratio between greedy online and offline: " + competetiveRatio1);
 
 //		System.out.println("\nHUNGARIAN");
 //		bell.execute(filename, numNodes, "hungarian");

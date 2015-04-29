@@ -12,8 +12,8 @@ import java.util.Iterator;
  * 
  */
 public class BellmanFord {
-	
-	private double constant = 1.0;
+
+	private double constant = 3.0;
 
 	private UberObject[] taxis; // Set A
 	private UberObject[] customers; // Set B
@@ -46,7 +46,7 @@ public class BellmanFord {
 			result = computeOnlineMatching(filename, nodesToRead);
 			break;
 		case "greedy":
-			result = computeGreedyOnlineMatching(filename, nodesToRead);
+			result = computeGreedyMatching(filename, nodesToRead);
 			break;
 		}
 		return result;
@@ -238,131 +238,84 @@ public class BellmanFord {
 		return totalCost;
 	}
 
+	// TODO
 	public double computeOnlineMatching(String filename, int numSetA) {
 		// Final online matching ArrayList of directed edges
 		ArrayList<DirectedEdge> onlineMatching = new ArrayList<DirectedEdge>();
-		
-		ArrayList<DirectedEdge> testMatching = new ArrayList<DirectedEdge>();
 
 		// Temporary matching ArrayList of Set B values for internal management
 		ArrayList<Integer> matching = new ArrayList<Integer>();
 
-		// ArrayList that stores all negative cycle indices for repeated
-		// processing
-		ArrayList<Integer> negativeCycleIndex = new ArrayList<Integer>();
-
 		// Index of the current source node being processed
 		int index = 0;
-
-		// double totalCost = 0;
-
-		// Boolean value that is set to true
-		boolean runNegativeCycleIndices = false;
 
 		ArrayList<Integer> sourceIndices = new ArrayList<Integer>();
 		for (int i = 0; i < numSetA; i++) {
 			sourceIndices.add(i);
 		}
-		// sourceIndices.add(2);
-		// sourceIndices.add(1);
-		// sourceIndices.add(0);
+		ArrayList<Integer> destinationIndices = new ArrayList<Integer>();
+		for (int i = numSetA; i < numSetA * 2; i++) {
+			destinationIndices.add(i);
+		}
+		// destinationIndices.add(4);
+		// destinationIndices.add(3);
+		// destinationIndices.add(5);
+
+		Collections.shuffle(destinationIndices);
 
 		double[][] tempMatrix = generateInitialMatrix();
 
+		// Construct a DiGraph from the original costmatrix
 		EdgeWeightedDigraph original = null;
 
-		// Randomizes the source node indices chosen for augmentation
-		Collections.shuffle(sourceIndices);
-
-		System.out.println("Source Order: " + sourceIndices.toString());
+		System.out.println("Destination Order: "
+				+ destinationIndices.toString());
 
 		/*
 		 * Core of the algorithm
-		 * 
-		 * Algorithm repeats until matching is perfect. Source node index is
-		 * picked and BellmanFord is ran on that node. This computes all the
-		 * paths and their costs from the source node to every target node. All
-		 * paths are processed to choose the minimum cost and to also check for
-		 * negative cycles. If a negative cycle occurs on the node, then add it
-		 * to the negativeCycleIndex ArrayList and move on to the next source
-		 * node. Else, the minimum cost path is chosen. The best path is added
-		 * to an ArrayList bestPath and a new DiGraph is constructed with the
-		 * best cost matching and the previous matchings. This new edge matching
-		 * is added to the matchings ArrayList and the original DiGraph is
-		 * updated with this new DiGraph. The process is repeated.
-		 * 
-		 * If negative cycles occurred during the processing, an additional
-		 * iteration over the negativeCycleIndex ArrayList is ran to process
-		 * these indices and find their proper matchings.
 		 */
 		while (matching.size() < numSetA) {
 
 			if (index == numSetA) { // Last source index to process?
-				if (negativeCycleIndex.size() > 0) { // Negative cycles to
-					// process?
-					index = negativeCycleIndex.remove(0);
-					runNegativeCycleIndices = true;
-				} else {
-					break; // All processing complete
-				}
+				break; // All processing complete
 			}
 
-			tempMatrix = normalizeMatrix(index, tempMatrix);
-
-			// if (index == 0) {
-			original = constructDigraphFromMatrix(tempMatrix);
-			// } else {
-			// combine digraph with temp matrix to get the next point accounted
-			// for
-			// originalMatrix = constructMatrixFromDiGraph(original);
-
-			// }
-
-			// Construct a DiGraph from the original costmatrix
-
-			int source = sourceIndices.get(index);
-			int destination = -1;
-			// Run BellmanFord algorithm on source index
-			BellmanFordSP sp = new BellmanFordSP(original, source);
+			int destinationIndex = destinationIndices.get(index);
 
 			Iterator<DirectedEdge> iter = null;
-			ArrayList<DirectedEdge> bestPath = new ArrayList<DirectedEdge>();
 
+			tempMatrix = normalizeMatrix(destinationIndex - numSetA,
+					tempMatrix, true);
+
+			original = constructDigraphFromMatrix(tempMatrix);
+
+			ArrayList<DirectedEdge> bestPath = new ArrayList<DirectedEdge>();
 			double minPath = Double.MAX_VALUE;
 
-			// Obtain minimum cost path
-			for (int v = numSetA; v < original.V(); v++) {
+			for (int source : sourceIndices) {
 
-				if (matching.contains(v)) {
+				if (matching.contains(source)) {
 					continue;
 				}
 
-				if (sp.hasNegativeCycle()) {
-					negativeCycleIndex.add(index);
-					index++;
-					break;
-				}
+				BellmanFordSP sp = new BellmanFordSP(original, source);
 
-				if (sp.hasPathTo(v)) {
-					if (sp.distTo(v) < minPath) {
-						minPath = sp.distTo(v);
-						iter = sp.pathTo(v).iterator();
-						destination = v;
+				if (sp.hasPathTo(destinationIndex)) {
+					double distance = sp.distTo(destinationIndex);
+
+					if (distance < minPath) {
+						minPath = distance;
+						iter = sp.pathTo(destinationIndex).iterator();
 					}
 				}
-			}
-
-			// Negative cycle detected, don't process current index
-			if (iter == null) {
-				if (runNegativeCycleIndices) {
-					index = numSetA;
-				}
-				continue;
 			}
 
 			while (iter.hasNext()) {
 				bestPath.add(iter.next());
 			}
+
+			int source = bestPath.get(0).from();
+			int destination = bestPath.get(bestPath.size() - 1).to();
 
 			// New iteration DiGraph that will have updated edges
 			EdgeWeightedDigraph nextIterationGraph = new EdgeWeightedDigraph(
@@ -374,41 +327,27 @@ public class BellmanFord {
 				if (containsEdge(bestPath, e)) {
 					DirectedEdge edgeToAdd = null;
 					if (e.weight() < 0.0) {
-						edgeToAdd = new DirectedEdge(e.to(), e.from(),
-								-1.0 * e.weight());
+						edgeToAdd = new DirectedEdge(e.to(), e.from(), -1.0
+								* constant * e.weight());
 					} else {
 						edgeToAdd = new DirectedEdge(e.to(), e.from(),
-								(-1.0 * e.weight())/constant);
+								(-1.0 * e.weight()) / constant);
 					}
-//					DirectedEdge edgeToAdd = new DirectedEdge(e.to(), e.from(),
-//							(-1.0 * e.weight())/3.0);
+
 					nextIterationGraph.addEdge(edgeToAdd);
 					if (edgeToAdd.weight() <= 0) {
-						if (!matching.contains(e.to())) {
-							matching.add(e.to());
-//							onlineMatching.add(new DirectedEdge(source,
-//									destination, e.weight() / 3.0));
-							onlineMatching.add(edgeToAdd);
+						if (!matching.contains(e.from())) {
+							matching.add(e.from());
+
+							onlineMatching.add(new DirectedEdge(destination,
+									source, costMatrix[source][destination
+											- costMatrix[index].length]));
 						}
 					}
 				} else {
 					DirectedEdge constantEdge = null;
-					if (e.weight() >= 0.0) {
-//						if (!containsEdge(testMatching, e)) {
-//							constantEdge = new DirectedEdge(e.from(), e.to(),
-//									3.0 * e.weight());
-//							testMatching.add(constantEdge);
-//						} else {
-							constantEdge = new DirectedEdge(e.from(), e.to(),
-									1.0 * e.weight());
-//						}
-						
-					} else {
-						constantEdge = new DirectedEdge(e.from(), e.to(),
-								e.weight());
-					}
-					// constantEdge = new DirectedEdge(e.from(),
-					// e.to(), e.weight());
+					constantEdge = new DirectedEdge(e.from(), e.to(),
+							e.weight());
 					nextIterationGraph.addEdge(constantEdge);
 				}
 			}
@@ -427,23 +366,25 @@ public class BellmanFord {
 
 			// Increment index if not processing negative cycles, else set index
 			// to last source node
-			if (!runNegativeCycleIndices) {
-				index++;
-			} else {
-				index = numSetA;
-			}
+			// if (!runNegativeCycleIndices) {
+			index++;
+			// } else {
+			// index = numSetA;
+			// }
 		}
 
-		System.out.println("Online Matching Digraph: "
+		System.out.println("Online Digraph: "
 				+ onlineMatching.toString());
 
 		double totalCost = calculateTotalCost(onlineMatching);
 		System.out.println("TOTAL ONLINE NET COST: " + totalCost);
 
 		return totalCost;
-	}
 
-	public double computeGreedyOnlineMatching(String filename, int numSetA) {
+	}
+	
+	//TODO
+	public double computeGreedyMatching(String filename, int numSetA) {
 		// Final online matching ArrayList of directed edges
 		ArrayList<DirectedEdge> onlineMatching = new ArrayList<DirectedEdge>();
 
@@ -457,6 +398,7 @@ public class BellmanFord {
 		for (int i = 0; i < numSetA; i++) {
 			sourceIndices.add(i);
 		}
+		
 		ArrayList<Integer> destinationIndices = new ArrayList<Integer>();
 		for (int i = numSetA; i < numSetA * 2; i++) {
 			destinationIndices.add(i);
@@ -468,7 +410,6 @@ public class BellmanFord {
 
 		// Construct a DiGraph from the original costmatrix
 		EdgeWeightedDigraph original = constructDigraphFromMatrix(costMatrix);
-
 
 		System.out.println("Destination Order: "
 				+ destinationIndices.toString());
@@ -487,7 +428,7 @@ public class BellmanFord {
 			Iterator<DirectedEdge> iter = null;
 
 			double[][] tempMatrix = normalizeMatrix(destinationIndex - numSetA,
-					initialMatrix);
+					initialMatrix, false);
 
 			ArrayList<DirectedEdge> taxiPath = new ArrayList<DirectedEdge>();
 			ArrayList<Double> taxiDistances = new ArrayList<Double>();
@@ -556,11 +497,11 @@ public class BellmanFord {
 			index++;
 		}
 
-		System.out.println("Online Greedy Digraph: "
+		System.out.println("Greedy Digraph: "
 				+ onlineMatching.toString());
 
 		double totalCost = calculateTotalCost(onlineMatching);
-		System.out.println("TOTAL GREEDY ONLINE NET COST: " + totalCost);
+		System.out.println("TOTAL GREEDY NET COST: " + totalCost);
 
 		return totalCost;
 
@@ -623,11 +564,17 @@ public class BellmanFord {
 		return tempMatrix;
 	}
 
-	private double[][] normalizeMatrix(int column, double[][] tempMatrix) {
+	private double[][] normalizeMatrix(int column, double[][] tempMatrix,
+			boolean hasConstant) {
 		for (int i = 0; i < tempMatrix.length; i++) {
 			for (int j = 0; j < tempMatrix[i].length; j++) {
 				if (/* tempMatrix[i][j] == 100000.0 && */j == column) {
-					tempMatrix[i][j] = constant * costMatrix[i][j];
+					if (hasConstant) {
+						tempMatrix[i][j] = constant * costMatrix[i][j];
+					} else {
+						tempMatrix[i][j] = costMatrix[i][j];
+					}
+
 				}
 			}
 		}
