@@ -1,4 +1,7 @@
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Driver to run Bellman Ford or Hungarian algorithms.
@@ -16,38 +19,74 @@ public class Driver {
 	 *            dataset.
 	 */
 	public static void main(String[] args) {
+		runTests();
+//		int numNodes = 10;
+//		String filename = "trip_data_test.csv";
+//		filename = "synthetic2D";
+////		 filename = "example";
+//
+//		 DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+//		 Calendar cal = Calendar.getInstance();
+//		 System.out.println("Start: " + dateFormat.format(cal.getTime()));
+//
+//		// System.out.println("BELLMAN");
+//		BellmanFord bell = new BellmanFord();
+//		ArrayList<Integer> destinationOrder = bell.permuateDestinations(
+//				filename, numNodes);
+//		
+//		double offlineCost = bell.execute(filename, numNodes, "offline",
+//				destinationOrder);
+//		double onlineCost = bell.execute(filename, numNodes, "online",
+//				destinationOrder);
+//		double onlineGreedyCost = bell.execute(filename, numNodes, "greedy",
+//				destinationOrder);
+//		double competetiveRatio = onlineCost / offlineCost;
+//		double competetiveRatio1 = onlineGreedyCost / offlineCost;
+//		System.out.println("Competitive Ratio between online and offline: "
+//				+ competetiveRatio);
+//		System.out
+//				.println("Competitive Ratio between greedy online and offline: "
+//						+ competetiveRatio1);
+//
+//		// System.out.println("\nHUNGARIAN");
+//		// bell.execute(filename, numNodes, "hungarian");
+//
+//		 cal = Calendar.getInstance();
+//		 System.out.println("End: " + dateFormat.format(cal.getTime()));
+	}
+	
+	public static void runTests() {
 		int numNodes = 350;
 		String filename = "trip_data_test.csv";
-//		filename = "synthetic2D";
-		// filename = "example";
-
-		// DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-		// Calendar cal = Calendar.getInstance();
-		// System.out.println("Start: " + dateFormat.format(cal.getTime()));
-
-		// System.out.println("BELLMAN");
+		filename = "synthetic2D";
+//		 filename = "example";
+		
+		Double[] coefficients = {1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 10.0, 25.0};
 		BellmanFord bell = new BellmanFord();
 		ArrayList<Integer> destinationOrder = bell.permuateDestinations(
 				filename, numNodes);
-
+		
 		double offlineCost = bell.execute(filename, numNodes, "offline",
 				destinationOrder);
-		double onlineCost = bell.execute(filename, numNodes, "online",
-				destinationOrder);
-		double onlineGreedyCost = bell.execute(filename, numNodes, "greedy",
-				destinationOrder);
-		double competetiveRatio = onlineCost / offlineCost;
-		double competetiveRatio1 = onlineGreedyCost / offlineCost;
-		System.out.println("Competitive Ratio between online and offline: "
-				+ competetiveRatio);
-		System.out
-				.println("Competitive Ratio between greedy online and offline: "
-						+ competetiveRatio1);
-
-		// System.out.println("\nHUNGARIAN");
-		// bell.execute(filename, numNodes, "hungarian");
-
-		// cal = Calendar.getInstance();
-		// System.out.println("End: " + dateFormat.format(cal.getTime()));
+		
+		for (int i = 0; i < coefficients.length; i++) {
+			bell.setConstant(coefficients[i]);
+			double competetiveRatioOnline = 0;
+			double competetiveRatioGreedy = 0;
+			
+			for (int j = 0; j < 20; j++) {
+				double onlineCost = bell.execute(filename, numNodes, "online",
+						destinationOrder);
+				double onlineGreedyCost = bell.execute(filename, numNodes, "greedy",
+						destinationOrder);
+				
+				competetiveRatioOnline += onlineCost / offlineCost;
+				competetiveRatioGreedy += onlineGreedyCost / offlineCost;
+			}
+			System.out.print(competetiveRatioOnline/20 + "\t");
+			System.out.print(competetiveRatioGreedy/20 + "\t");
+			System.out.println();
+			
+		}
 	}
 }

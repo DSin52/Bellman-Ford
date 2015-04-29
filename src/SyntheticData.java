@@ -8,8 +8,8 @@ public class SyntheticData {
 	
 	public double[][] generateSynthetic2D(int nodeSize) {
 
-		Random randSetA = new Random(20);
-		Random randSetB = new Random(50);
+		Random randSetA = new Random();
+		Random randSetB = new Random();
 		
 
 		double[][] costMatrix = new double[nodeSize][nodeSize];
@@ -24,6 +24,7 @@ public class SyntheticData {
 				costMatrix[i][j] = Math.sqrt(Math.pow((X2-X1), 2.0) + Math.pow((Y2-Y1), 2.0));
 			}
 		}
+
 		return costMatrix;
 	}
 
