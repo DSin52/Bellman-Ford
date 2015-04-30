@@ -18,6 +18,7 @@ public class BellmanFord {
 	private UberObject[] taxis; // Set A
 	private UberObject[] customers; // Set B
 	private double[][] costMatrix; // Cost matrix where each element is distance
+	private double temp = 0.0;
 	
 	public void setConstant(double constant) {
 		this.constant = constant;
@@ -390,7 +391,17 @@ public class BellmanFord {
 //		System.out.println("Online Digraph: " + onlineMatching.toString());
 
 		double totalCost = calculateTotalCost(onlineMatching);
+		
+		int numEdges = 0;
+		for (DirectedEdge e : onlineMatching) {
+			if (e.weight() > (totalCost/numSetA)*0.2) {
+				numEdges++;
+			}
+		}
+		System.out.println("NUMBER EDGES ONLINE > AVERAGE: " + numEdges);
 //		System.out.println("TOTAL ONLINE NET COST: " + totalCost);
+		
+		temp = totalCost;
 
 		return totalCost;
 
@@ -423,6 +434,19 @@ public class BellmanFord {
 		}
 		
 		double totalCost = calculateTotalCost(matching);
+		
+		int numEdges = 0;
+		double minCost = Double.MAX_VALUE;
+		for (DirectedEdge e : matching) {
+			if (e.weight() < minCost) {
+				minCost = e.weight();
+			}
+			if (e.weight() > (temp/numSetA)*0.2) {
+				numEdges++;
+			}
+		}
+		System.out.println("GREEDY MIN EDGE WEIGHT: " + minCost);
+		System.out.println("NUMBER EDGES GREEDY > AVERAGE: " + numEdges);
 //		System.out.println("TOTAL GREEDY NET COST: " + totalCost);
 		
 		return totalCost;

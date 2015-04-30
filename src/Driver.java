@@ -20,7 +20,7 @@ public class Driver {
 	 */
 	public static void main(String[] args) {
 		//runTests();
-		int numNodes = 350;
+		int numNodes = 100;
 		String filename = "trip_data_test.csv";
 		filename = "synthetic2D";
 //		 filename = "example";
@@ -31,7 +31,7 @@ public class Driver {
 
 		// System.out.println("BELLMAN");
 		BellmanFord bell = new BellmanFord();
-		bell.setConstant(3.0);
+		bell.setConstant(100.0);
 		ArrayList<Integer> destinationOrder = bell.permuateDestinations(
 				filename, numNodes);
 		
@@ -41,6 +41,9 @@ public class Driver {
 				destinationOrder);
 		double onlineGreedyCost = bell.execute(filename, numNodes, "greedy",
 				destinationOrder);
+		System.out.println("OFFLINE COST: " + offlineCost);
+		System.out.println("ONLINE COST: " + onlineCost);
+		System.out.println("GREEDY COST: " + onlineGreedyCost);
 		double competetiveRatio = onlineCost / offlineCost;
 		double competetiveRatio1 = onlineGreedyCost / offlineCost;
 		System.out.println("Competitive Ratio between online and offline: "
@@ -96,4 +99,15 @@ public class Driver {
 		 cal = Calendar.getInstance();
 		 System.out.println("End: " + dateFormat.format(cal.getTime()));
 	}
+	
+	// Run on coefficients with delta of 0.1
+	// Run execution for 5 different random point permutations
+	// For each random point permutation, run 5 different destination order permutations
+	
+	
+	// How many times are we mapping to the nearest neighbor in online algorithm?
+	// Cost of offline matching when doing online version should be at most 3 * optimal (pure offline matching)
+	
+	// Look at augmenting paths of length 1. All direct augmenting paths of lengths 1
+	// Two unmatched points, coefficient is 1.0. Everything else remains the same.
 }
