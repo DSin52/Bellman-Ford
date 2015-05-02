@@ -27,6 +27,37 @@ public class SyntheticData {
 
 		return costMatrix;
 	}
+	
+	public double[][] generateSynthetic2DExample(int nodeSize) {
+		ArrayList<UberObject> taxis = new ArrayList<UberObject>();
+		ArrayList<UberObject> requests = new ArrayList<UberObject>();
+		
+		double[][] costMatrix = new double[32][32];
+		UberObject object = null;
+		for (int i = 0; i <= 7; i++) {
+			for (int j = 0; j <= 7; j++) {
+				object = new UberObject(String.valueOf(i), String.valueOf(j));
+				if ((i+j) % 2 == 0) {
+					taxis.add(object);
+				} else {
+					requests.add(object);
+				}
+			}
+		}
+		
+		for (int i = 0; i < costMatrix.length; i++) {
+			for (int j = 0; j < costMatrix[i].length; j++) {
+				int X1 = Integer.valueOf(taxis.get(i).getLatitude());
+				int Y1 = Integer.valueOf(taxis.get(i).getLongitude());
+				int X2 = Integer.valueOf(requests.get(j).getLatitude());
+				int Y2 = Integer.valueOf(requests.get(j).getLongitude());
+
+				costMatrix[i][j] = Math.sqrt(Math.pow((X2-X1), 2.0) + Math.pow((Y2-Y1), 2.0));
+			}
+		}
+		
+		return costMatrix;
+	}
 
 	/**
 	 * Generates the synthetic data and creates a cost matrix.

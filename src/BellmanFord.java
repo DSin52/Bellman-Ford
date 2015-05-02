@@ -13,7 +13,7 @@ import java.util.Iterator;
  */
 public class BellmanFord {
 
-	private double constant = 1.5;
+	private double constant = 1.0;
 
 	private UberObject[] taxis; // Set A
 	private UberObject[] customers; // Set B
@@ -29,16 +29,16 @@ public class BellmanFord {
 		
 		ArrayList<Integer> destinationIndices = new ArrayList<Integer>();
 
-//		int[] tester = {573, 579, 441, 663, 575, 682, 429, 675, 483, 411, 698, 680, 529, 477, 386, 536, 493, 492, 419, 554, 504, 628, 396, 456, 359, 410, 686, 542, 672, 642, 673, 426, 609, 374, 484, 679, 643, 631, 565, 413, 403, 394, 626, 610, 384, 599, 437, 522, 351, 507, 670, 586, 455, 543, 691, 696, 674, 373, 648, 595, 537, 475, 629, 547, 513, 414, 465, 539, 355, 623, 568, 452, 489, 398, 350, 367, 376, 651, 450, 589, 641, 514, 433, 502, 692, 541, 371, 448, 650, 678, 498, 644, 511, 601, 572, 431, 497, 632, 361, 480, 518, 531, 406, 379, 519, 481, 451, 467, 463, 453, 509, 619, 491, 499, 597, 569, 583, 405, 490, 576, 404, 556, 487, 368, 423, 591, 634, 618, 363, 581, 625, 566, 594, 604, 571, 562, 558, 472, 505, 535, 540, 369, 549, 577, 422, 546, 587, 360, 697, 649, 694, 377, 488, 653, 354, 606, 445, 449, 533, 409, 485, 515, 667, 525, 427, 446, 612, 567, 390, 665, 614, 527, 474, 464, 468, 689, 600, 570, 401, 454, 557, 688, 430, 544, 365, 561, 476, 657, 681, 555, 646, 495, 652, 530, 375, 399, 501, 478, 580, 603, 560, 605, 479, 664, 459, 442, 520, 389, 462, 516, 592, 496, 598, 659, 352, 640, 457, 438, 658, 552, 526, 627, 588, 417, 638, 470, 387, 473, 415, 684, 602, 666, 624, 503, 613, 388, 444, 385, 391, 420, 524, 421, 615, 532, 440, 381, 383, 447, 622, 590, 668, 461, 596, 380, 408, 506, 460, 645, 521, 550, 676, 630, 402, 655, 639, 378, 662, 593, 564, 356, 687, 392, 538, 424, 466, 635, 677, 397, 436, 654, 407, 517, 551, 366, 699, 510, 393, 585, 416, 607, 690, 661, 685, 523, 443, 534, 548, 469, 372, 621, 647, 357, 358, 382, 545, 364, 528, 500, 434, 370, 486, 435, 400, 494, 574, 608, 637, 584, 428, 439, 617, 656, 482, 582, 559, 611, 508, 671, 395, 669, 616, 471, 660, 683, 620, 695, 353, 362, 412, 512, 563, 458, 432, 425, 693, 418, 636, 553, 633, 578};
-//		for (int i = 0; i < tester.length; i++) {
-//			destinationIndices.add(tester[i]);
-//		}
-		
-		for (int i = nodesToRead; i < nodesToRead * 2; i++) {
-			destinationIndices.add(i);
+		int[] tester = {46, 33, 45, 41, 43, 59, 50, 61, 47, 32, 36, 40, 39, 53, 60, 51, 52, 62, 38, 42, 56, 35, 44, 63, 34, 55, 57, 37, 54, 48, 49, 58};
+		for (int i = 0; i < tester.length; i++) {
+			destinationIndices.add(tester[i]);
 		}
-
-		Collections.shuffle(destinationIndices);
+		
+//		for (int i = nodesToRead; i < nodesToRead * 2; i++) {
+//			destinationIndices.add(i);
+//		}
+//
+//		Collections.shuffle(destinationIndices);
 		
 		return destinationIndices;
 	}
@@ -51,8 +51,8 @@ public class BellmanFord {
 		case "synthetic":
 			costMatrix = new SyntheticData().generateSynthetic(nodesToRead);
 			break;
-		case "synthetic2D":
-			costMatrix = new SyntheticData().generateSynthetic2D(nodesToRead);
+		case "synthetic2DExample":
+			costMatrix = new SyntheticData().generateSynthetic2DExample(nodesToRead);
 			break;
 		case "example":
 			costMatrix = new SyntheticData().generateExample();
@@ -257,8 +257,8 @@ public class BellmanFord {
 			}
 		}
 
-//		System.out.println("Offline Matching Digraph: "
-//				+ offlineMatching.toString());
+		System.out.println("Offline Matching Digraph: "
+				+ offlineMatching.toString());
 
 		double totalCost = calculateTotalCost(offlineMatching);
 //		System.out.println("TOTAL OFFLINE COST: " + totalCost);
@@ -388,7 +388,7 @@ public class BellmanFord {
 			// }
 		}
 
-//		System.out.println("Online Digraph: " + onlineMatching.toString());
+		System.out.println("Online Digraph: " + onlineMatching.toString());
 
 		double totalCost = calculateTotalCost(onlineMatching);
 		
@@ -398,7 +398,7 @@ public class BellmanFord {
 				numEdges++;
 			}
 		}
-		System.out.println("NUMBER EDGES ONLINE > AVERAGE: " + numEdges);
+//		System.out.println("NUMBER EDGES ONLINE > AVERAGE: " + numEdges);
 //		System.out.println("TOTAL ONLINE NET COST: " + totalCost);
 		
 		temp = totalCost;
@@ -433,6 +433,7 @@ public class BellmanFord {
 			index++;
 		}
 		
+		System.out.println("Greedy Matching: " + matching.toString());
 		double totalCost = calculateTotalCost(matching);
 		
 		int numEdges = 0;
@@ -445,8 +446,8 @@ public class BellmanFord {
 				numEdges++;
 			}
 		}
-		System.out.println("GREEDY MIN EDGE WEIGHT: " + minCost);
-		System.out.println("NUMBER EDGES GREEDY > AVERAGE: " + numEdges);
+//		System.out.println("GREEDY MIN EDGE WEIGHT: " + minCost);
+//		System.out.println("NUMBER EDGES GREEDY > AVERAGE: " + numEdges);
 //		System.out.println("TOTAL GREEDY NET COST: " + totalCost);
 		
 		return totalCost;

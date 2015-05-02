@@ -39,5 +39,9 @@ public class UberObject {
 	public void setLongitude(String longitude) {
 		this.longitude = longitude;
 	}
+	
+	public String toString() {
+		return "(" + latitude + ", " + longitude + ")"; 
+	}
 
 }
