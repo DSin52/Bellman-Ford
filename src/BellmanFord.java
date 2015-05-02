@@ -28,34 +28,31 @@ public class BellmanFord {
 			int nodesToRead) {
 		
 		ArrayList<Integer> destinationIndices = new ArrayList<Integer>();
-//
-		int[] tester = {46, 33, 45, 41, 43, 59, 50, 61, 47, 32, 36, 40, 39, 53, 60, 51, 52, 62, 38, 42, 56, 35, 44, 63, 34, 55, 57, 37, 54, 48, 49, 58};
-		for (int i = 0; i < tester.length; i++) {
-			destinationIndices.add(tester[i]);
-		}
-		
-//		for (int i = nodesToRead; i < nodesToRead * 2; i++) {
-//			destinationIndices.add(i);
+
+//		int[] tester = {137, 100, 111, 104, 187, 142, 124, 164, 176, 141, 129, 163, 143, 132, 190, 125, 177, 153, 138, 150, 148, 103, 109, 135, 193, 101, 139, 156, 181, 147, 183, 166, 144, 180, 126, 146, 172, 171, 159, 157, 120, 110, 152, 105, 191, 154, 128, 161, 182, 173, 119, 192, 133, 113, 175, 102, 170, 130, 194, 174, 189, 158, 155, 131, 185, 168, 149, 178, 140, 107, 114, 167, 195, 134, 117, 106, 160, 112, 122, 186, 188, 151, 115, 118, 184, 169, 116, 145, 123, 98, 165, 179, 108, 121, 136, 99, 127, 162};
+//		for (int i = 0; i < tester.length; i++) {
+//			destinationIndices.add(tester[i]);
 //		}
-//
-//		Collections.shuffle(destinationIndices);
+		
+		for (int i = nodesToRead; i < nodesToRead * 2; i++) {
+			destinationIndices.add(i);
+		}
+
+		Collections.shuffle(destinationIndices);
 		
 		return destinationIndices;
 	}
 	
-	public void generateCostMatrix(int nodesToRead) {
-		costMatrix = new SyntheticData().generateSynthetic2DExample(nodesToRead);
-	}
-
-	public double execute(String filename, int nodesToRead, String type,
-			ArrayList<Integer> destinationIndices) {
-		double result = 0.0;
-
+	public void generateCostMatrix(String filename, int nodesToRead) {
 		switch (filename) {
 		case "synthetic":
 			costMatrix = new SyntheticData().generateSynthetic(nodesToRead);
 			break;
+		case "synthetic2D":
+			costMatrix = new SyntheticData().generateSynthetic2D(nodesToRead);
+			break;
 		case "synthetic2DExample":
+			costMatrix = new SyntheticData().generateSynthetic2DExample(nodesToRead);
 			break;
 		case "example":
 			costMatrix = new SyntheticData().generateExample();
@@ -72,6 +69,11 @@ public class BellmanFord {
 //			}
 //			System.out.println();
 //		}
+	}
+
+	public double execute(String filename, int nodesToRead, String type,
+			ArrayList<Integer> destinationIndices) {
+		double result = 0.0;
 
 		switch (type) {
 		case "hungarian":

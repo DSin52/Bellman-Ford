@@ -37,8 +37,9 @@ public class SyntheticData {
 		
 		double[][] costMatrix = new double[nodeSize][nodeSize];
 		UberObject object = null;
-		for (int i = 0; i <= 7; i++) {
-			for (int j = 0; j <= 7; j++) {
+		double ending = Math.sqrt(nodeSize * 2);
+		for (int i = 0; i < ending; i++) {
+			for (int j = 0; j < ending; j++) {
 				object = new UberObject(String.valueOf(i), String.valueOf(j));
 				allPoints.add(object);
 //				if ((i+j) % 2 == 0) {
@@ -51,10 +52,16 @@ public class SyntheticData {
 		Collections.shuffle(allPoints);
 		
 		for (int i = 0; i < allPoints.size(); i++) {
-			if (i < 32) {
+			if (i < nodeSize) {
 				taxis.add(allPoints.get(i));
+				System.out.print(allPoints.get(i).getLatitude() + " ");
+				System.out.println();
+				System.out.print(allPoints.get(i).getLongitude() + " ");
 			} else {
 				requests.add(allPoints.get(i));
+				System.out.print(allPoints.get(i).getLatitude() + " ");
+				System.out.println();
+				System.out.print(allPoints.get(i).getLongitude() + " ");
 			}
 		}
 		
@@ -65,7 +72,9 @@ public class SyntheticData {
 				int X2 = Integer.valueOf(requests.get(j).getLatitude());
 				int Y2 = Integer.valueOf(requests.get(j).getLongitude());
 
-				costMatrix[i][j] = Math.sqrt(Math.pow((X2-X1), 2.0) + Math.pow((Y2-Y1), 2.0));
+				// Round it off to the 100's place if you are using distance formula
+//				costMatrix[i][j] = Math.sqrt(Math.pow((X2-X1), 2.0) + Math.pow((Y2-Y1), 2.0));
+				costMatrix[i][j] = Math.abs(X1 - X2) + Math.abs(Y1 - Y2);
 			}
 		}
 		

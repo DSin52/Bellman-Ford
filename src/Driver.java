@@ -32,7 +32,7 @@ public class Driver {
 		// System.out.println("BELLMAN");
 		BellmanFord bell = new BellmanFord();
 		bell.setConstant(3.0);
-		bell.generateCostMatrix(numNodes);
+		bell.generateCostMatrix(filename, numNodes);
 		
 		ArrayList<Integer> destinationOrder = bell.permuateDestinations(filename, numNodes);
 		System.out.println("Destination Index Order: " + destinationOrder.toString());
@@ -82,6 +82,7 @@ public class Driver {
 				competetiveRatioOnline += onlineCost / offlineCost;
 				competetiveRatioGreedy += onlineGreedyCost / offlineCost;
 			}
+			
 			System.out.print(competetiveRatioOnline / 5 + "\t");
 			System.out.print(competetiveRatioGreedy / 5 + "\t");
 			System.out.println();
