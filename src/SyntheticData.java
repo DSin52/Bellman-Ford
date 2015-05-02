@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 /**
@@ -31,17 +32,29 @@ public class SyntheticData {
 	public double[][] generateSynthetic2DExample(int nodeSize) {
 		ArrayList<UberObject> taxis = new ArrayList<UberObject>();
 		ArrayList<UberObject> requests = new ArrayList<UberObject>();
+		ArrayList<UberObject> allPoints = new ArrayList<UberObject>();
 		
-		double[][] costMatrix = new double[32][32];
+		
+		double[][] costMatrix = new double[nodeSize][nodeSize];
 		UberObject object = null;
 		for (int i = 0; i <= 7; i++) {
 			for (int j = 0; j <= 7; j++) {
 				object = new UberObject(String.valueOf(i), String.valueOf(j));
-				if ((i+j) % 2 == 0) {
-					taxis.add(object);
-				} else {
-					requests.add(object);
-				}
+				allPoints.add(object);
+//				if ((i+j) % 2 == 0) {
+//					taxis.add(object);
+//				} else {
+//					requests.add(object);
+//				}
+			}
+		}
+		Collections.shuffle(allPoints);
+		
+		for (int i = 0; i < allPoints.size(); i++) {
+			if (i < 32) {
+				taxis.add(allPoints.get(i));
+			} else {
+				requests.add(allPoints.get(i));
 			}
 		}
 		

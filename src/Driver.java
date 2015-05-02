@@ -31,10 +31,12 @@ public class Driver {
 
 		// System.out.println("BELLMAN");
 		BellmanFord bell = new BellmanFord();
-//		bell.setConstant(3.0);
+		bell.setConstant(3.0);
+		bell.generateCostMatrix(numNodes);
+		
 		ArrayList<Integer> destinationOrder = bell.permuateDestinations(filename, numNodes);
 		System.out.println("Destination Index Order: " + destinationOrder.toString());
-
+		
 		double offlineCost = bell.execute(filename, numNodes, "offline", destinationOrder);
 		double onlineCost = bell.execute(filename, numNodes, "online", destinationOrder);
 		double onlineGreedyCost = bell.execute(filename, numNodes, "greedy", destinationOrder);

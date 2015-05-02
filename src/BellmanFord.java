@@ -28,7 +28,7 @@ public class BellmanFord {
 			int nodesToRead) {
 		
 		ArrayList<Integer> destinationIndices = new ArrayList<Integer>();
-
+//
 		int[] tester = {46, 33, 45, 41, 43, 59, 50, 61, 47, 32, 36, 40, 39, 53, 60, 51, 52, 62, 38, 42, 56, 35, 44, 63, 34, 55, 57, 37, 54, 48, 49, 58};
 		for (int i = 0; i < tester.length; i++) {
 			destinationIndices.add(tester[i]);
@@ -42,6 +42,10 @@ public class BellmanFord {
 		
 		return destinationIndices;
 	}
+	
+	public void generateCostMatrix(int nodesToRead) {
+		costMatrix = new SyntheticData().generateSynthetic2DExample(nodesToRead);
+	}
 
 	public double execute(String filename, int nodesToRead, String type,
 			ArrayList<Integer> destinationIndices) {
@@ -52,7 +56,6 @@ public class BellmanFord {
 			costMatrix = new SyntheticData().generateSynthetic(nodesToRead);
 			break;
 		case "synthetic2DExample":
-			costMatrix = new SyntheticData().generateSynthetic2DExample(nodesToRead);
 			break;
 		case "example":
 			costMatrix = new SyntheticData().generateExample();
@@ -62,6 +65,13 @@ public class BellmanFord {
 			computeCostMatrix();
 			break;
 		}
+		
+//		for (int i = 0; i < costMatrix.length; i++) {
+//			for (int j = 0; j < costMatrix.length; j++) {
+//				System.out.print(costMatrix[i][j] + ", ");
+//			}
+//			System.out.println();
+//		}
 
 		switch (type) {
 		case "hungarian":
