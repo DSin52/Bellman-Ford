@@ -20,9 +20,9 @@ public class Driver {
 	 */
 	public static void main(String[] args) {
 		// runTests();
-		int numNodes = 32;
+		int numNodes = 350;
 		String filename = "trip_data_test.csv";
-		filename = "synthetic2DExample";
+		filename = "synthetic2D";
 //		filename = "example";
 
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
