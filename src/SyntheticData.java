@@ -140,6 +140,56 @@ public class SyntheticData {
 
 		return costMatrix;
 	}
+	
+	public double[][] generateSynthetic2DExample2(int nodeSize) {
+		Random randSetA = new Random();
+		Random randSetB = new Random();
+
+		double[][] costMatrix = new double[nodeSize][nodeSize];
+
+		ArrayList<Double> Xtaxi = new ArrayList<Double>();
+		ArrayList<Double> Ytaxi = new ArrayList<Double>();
+		ArrayList<Double> Xrequest = new ArrayList<Double>();
+		ArrayList<Double> Yrequest = new ArrayList<Double>();
+		
+		for (int i = 0; i < nodeSize; i++) {
+			Xtaxi.add(randSetA.nextDouble());
+			Ytaxi.add(randSetA.nextDouble());
+		}
+		
+		for (int i = 0; i < nodeSize  / 2; i++) {
+			Xrequest.add(Xtaxi.get(i));
+			Yrequest.add(Ytaxi.get(i));
+		}
+		
+		for (int i = nodeSize / 2; i < nodeSize; i++) {
+			Xrequest.add(randSetB.nextDouble());
+			Yrequest.add(randSetB.nextDouble());
+		}
+		
+		/**
+		 * Generate 150 taxi locations randomly on a unit square. Next, choose half of these 150 taxi locations 
+		 * to be request locations as well (that gives you 75 request points identical to taxi locations). 
+			The remaining 75 request locations can be chosen randomly from the unit square.
+		 */
+		
+		
+
+		for (int i = 0; i < costMatrix.length; i++) {
+			for (int j = 0; j < costMatrix[i].length; j++) {
+				double X1 = Xtaxi.get(i);
+				double Y1 = Ytaxi.get(i);
+				
+				double X2 = Xrequest.get(j);
+				double Y2 = Yrequest.get(j);
+
+				costMatrix[i][j] = Math.sqrt(Math.pow((X2 - X1), 2.0)
+						+ Math.pow((Y2 - Y1), 2.0));
+			}
+		}
+		
+		return costMatrix;
+	}
 
 	/**
 	 * Generates the synthetic data and creates a cost matrix.

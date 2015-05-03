@@ -60,6 +60,9 @@ public class BellmanFord {
 		case "synthetic2DExample":
 			costMatrix = new SyntheticData().generateSynthetic2DExample(nodesToRead);
 			break;
+		case "synthetic2DExample2":
+			costMatrix = new SyntheticData().generateSynthetic2DExample2(nodesToRead);
+			break;
 		case "example":
 			costMatrix = new SyntheticData().generateExample();
 			break;

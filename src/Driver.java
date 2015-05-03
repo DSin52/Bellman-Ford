@@ -19,40 +19,40 @@ public class Driver {
 	 *            dataset.
 	 */
 	public static void main(String[] args) {
-		runTests();
-//		int numNodes = 350;
-//		String filename = "trip_data_test.csv";
-//		filename = "synthetic2D";
-////		filename = "example";
-//
-//		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-//		Calendar cal = Calendar.getInstance();
-//		System.out.println("Start: " + dateFormat.format(cal.getTime()));
-//
-//		// System.out.println("BELLMAN");
-//		BellmanFord bell = new BellmanFord();
-//		bell.setConstant(3.0);
-//		bell.generateCostMatrix(filename, numNodes);
-//		
-//		ArrayList<Integer> destinationOrder = bell.permuateDestinations(filename, numNodes);
-//		System.out.println("Destination Index Order: " + destinationOrder.toString());
-//		
-//		double offlineCost = bell.execute(filename, numNodes, "offline", destinationOrder);
-//		double onlineCost = bell.execute(filename, numNodes, "online", destinationOrder);
-//		double onlineGreedyCost = bell.execute(filename, numNodes, "greedy", destinationOrder);
-//		System.out.println("OFFLINE COST: " + offlineCost);
-//		System.out.println("ONLINE COST: " + onlineCost);
-//		System.out.println("GREEDY COST: " + onlineGreedyCost);
-//		double competetiveRatio = onlineCost / offlineCost;
-//		double competetiveRatio1 = onlineGreedyCost / offlineCost;
-//		System.out.println("Competitive Ratio between online and offline: " + competetiveRatio);
-//		System.out.println("Competitive Ratio between greedy online and offline: " + competetiveRatio1);
-//
-//		// System.out.println("\nHUNGARIAN");
-//		// bell.execute(filename, numNodes, "hungarian");
-//
-//		cal = Calendar.getInstance();
-//		System.out.println("End: " + dateFormat.format(cal.getTime()));
+//		runTests();
+		int numNodes = 150;
+		String filename = "trip_data_test.csv";
+		filename = "synthetic2D";
+//		filename = "example";
+
+		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+		Calendar cal = Calendar.getInstance();
+		System.out.println("Start: " + dateFormat.format(cal.getTime()));
+
+		// System.out.println("BELLMAN");
+		BellmanFord bell = new BellmanFord();
+		bell.setConstant(3.0);
+		bell.generateCostMatrix(filename, numNodes);
+		
+		ArrayList<Integer> destinationOrder = bell.permuateDestinations(filename, numNodes);
+		System.out.println("Destination Index Order: " + destinationOrder.toString());
+		
+		double offlineCost = bell.execute(filename, numNodes, "offline", destinationOrder);
+		double onlineCost = bell.execute(filename, numNodes, "online", destinationOrder);
+		double onlineGreedyCost = bell.execute(filename, numNodes, "greedy", destinationOrder);
+		System.out.println("OFFLINE COST: " + offlineCost);
+		System.out.println("ONLINE COST: " + onlineCost);
+		System.out.println("GREEDY COST: " + onlineGreedyCost);
+		double competetiveRatio = onlineCost / offlineCost;
+		double competetiveRatio1 = onlineGreedyCost / offlineCost;
+		System.out.println("Competitive Ratio between online and offline: " + competetiveRatio);
+		System.out.println("Competitive Ratio between greedy online and offline: " + competetiveRatio1);
+
+		// System.out.println("\nHUNGARIAN");
+		// bell.execute(filename, numNodes, "hungarian");
+
+		cal = Calendar.getInstance();
+		System.out.println("End: " + dateFormat.format(cal.getTime()));
 	}
 
 	public static void runTests() {
