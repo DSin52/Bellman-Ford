@@ -112,14 +112,8 @@ public class SyntheticData {
 		for (int i = 0; i < allPoints.size(); i++) {
 			if (i < nodeSize) {
 				taxis.add(allPoints.get(i));
-				System.out.print(allPoints.get(i).getLatitude() + " ");
-				System.out.println();
-				System.out.print(allPoints.get(i).getLongitude() + " ");
 			} else {
 				requests.add(allPoints.get(i));
-				System.out.print(allPoints.get(i).getLatitude() + " ");
-				System.out.println();
-				System.out.print(allPoints.get(i).getLongitude() + " ");
 			}
 		}
 
