@@ -20,13 +20,16 @@ public class Distance {
 	public static double haversine(String lat1, String long1, String lat2,
 			String long2) {
 		// TODO Auto-generated method stub
-		final int R = 6371; // Radious of the earth
+		final int R = 6371; // Radius of the earth
+		
 		double doublelat1 = Double.parseDouble(lat1);
 		double doublelon1 = Double.parseDouble(long1);
 		double doublelat2 = Double.parseDouble(lat2);
 		double doublelon2 = Double.parseDouble(long2);
+		
 		double latDistance = toRad(doublelat2 - doublelat1);
 		double lonDistance = toRad(doublelon2 - doublelon1);
+		
 		double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
 				+ Math.cos(toRad(doublelat1)) * Math.cos(toRad(doublelat2))
 				* Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
@@ -34,7 +37,6 @@ public class Distance {
 		double distance = R * c;
 
 		return distance;
-
 	}
 
 	/**
