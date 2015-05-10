@@ -3,18 +3,21 @@ import java.util.Collections;
 import java.util.Random;
 
 /**
- * Generates random synthetic 1-D data and the associated cost matrix.
+ * Generates random synthetic 1D and 2D data and the associated cost matrix.
  */
 public class SyntheticData {
 
 	/**
-	 * Generates the synthetic data and creates a cost matrix.
+	 * Generates 1D synthetic data and creates a cost matrix. Picks a random
+	 * integer between 0 and 10000 and adds it to setA (no repeats). Same thing
+	 * for setB. Generates the absolute value distance between each node of setA
+	 * and setB and creates a cost matrix.
 	 * 
-	 * @param nodeSize
-	 *            Number of total vertices in the synthetic data.
+	 * @param numSetA
+	 *            The number of taxis (nodes in set A)
 	 * @return Cost matrix of the data
 	 */
-	public double[][] generateSynthetic1D(int nodeSize) {
+	public double[][] generateSynthetic1D(int numSetA) {
 
 		Random randSetA = new Random();
 		Random randSetB = new Random();
@@ -22,7 +25,7 @@ public class SyntheticData {
 		ArrayList<Integer> setA = new ArrayList<Integer>();
 		ArrayList<Integer> setB = new ArrayList<Integer>();
 
-		for (int i = 0; i < nodeSize; i++) {
+		for (int i = 0; i < numSetA; i++) {
 			while (true) {
 				int test = randSetA.nextInt(10000);
 
@@ -45,7 +48,7 @@ public class SyntheticData {
 			}
 		}
 
-		double[][] costMatrix = new double[nodeSize][nodeSize];
+		double[][] costMatrix = new double[numSetA][numSetA];
 
 		for (int i = 0; i < costMatrix.length; i++) {
 			for (int j = 0; j < costMatrix[i].length; j++) {
@@ -55,19 +58,30 @@ public class SyntheticData {
 		return costMatrix;
 	}
 
-	public double[][] generateSynthetic2D(int nodeSize) {
+	/**
+	 * Generates 2D synthetic data and creates a cost matrix. Picks a random
+	 * number between 0 and 1. Creates (X1,Y1), (X2,Y2) based coordinates and
+	 * adds each (X1,Y1) to taxis and each (X2,Y2) to requests. Generates a cost
+	 * matrix by finding the distance using the distance formula between each
+	 * node from each set.
+	 * 
+	 * @param numSetA
+	 *            The number of taxis (nodes in set A)
+	 * @return Cost matrix of the data
+	 */
+	public double[][] generateSynthetic2D(int numSetA) {
 
 		Random randSetA = new Random();
 		Random randSetB = new Random();
 
-		double[][] costMatrix = new double[nodeSize][nodeSize];
+		double[][] costMatrix = new double[numSetA][numSetA];
 
 		ArrayList<Double> Xtaxi = new ArrayList<Double>();
 		ArrayList<Double> Ytaxi = new ArrayList<Double>();
 		ArrayList<Double> Xrequest = new ArrayList<Double>();
 		ArrayList<Double> Yrequest = new ArrayList<Double>();
 
-		for (int i = 0; i < nodeSize; i++) {
+		for (int i = 0; i < numSetA; i++) {
 			Xtaxi.add(randSetA.nextDouble());
 			Ytaxi.add(randSetA.nextDouble());
 			Xrequest.add(randSetB.nextDouble());
@@ -89,14 +103,33 @@ public class SyntheticData {
 		return costMatrix;
 	}
 
-	public double[][] generateSynthetic2DExample(int nodeSize) {
+	/**
+	 * Generates 2D synthetic data set based on this example from Dr.
+	 * Raghvendra:
+	 * 
+	 * Take numSetA * 2 points (numSetA of each type). These numSetA * 2 points
+	 * have integer coordinates that lie between 0 and sqrt(numSetA * 2). For
+	 * every integer 0 <= i,j <= sqrt(numSetA * 2), we have a point (i,j) in the
+	 * set.
+	 * 
+	 * Randomly permute all the points. The first half points in the random
+	 * permutation are taxi locations and the next half are request locations.
+	 * 
+	 * Generates a cost matrix based on distance provided by the manhattan
+	 * distance.
+	 * 
+	 * @param numSetA
+	 *            The number of taxis (nodes in set A)
+	 * @return Cost matrix of the data
+	 */
+	public double[][] generateSynthetic2DExample(int numSetA) {
 		ArrayList<UberObject> taxis = new ArrayList<UberObject>();
 		ArrayList<UberObject> requests = new ArrayList<UberObject>();
 		ArrayList<UberObject> allPoints = new ArrayList<UberObject>();
 
-		double[][] costMatrix = new double[nodeSize][nodeSize];
+		double[][] costMatrix = new double[numSetA][numSetA];
 		UberObject object = null;
-		double ending = Math.sqrt(nodeSize * 2);
+		double ending = Math.sqrt(numSetA * 2);
 		for (int i = 0; i < ending; i++) {
 			for (int j = 0; j < ending; j++) {
 				object = new UberObject(String.valueOf(i), String.valueOf(j));
@@ -107,7 +140,7 @@ public class SyntheticData {
 		Collections.shuffle(allPoints);
 
 		for (int i = 0; i < allPoints.size(); i++) {
-			if (i < nodeSize) {
+			if (i < numSetA) {
 				taxis.add(allPoints.get(i));
 			} else {
 				requests.add(allPoints.get(i));
@@ -133,11 +166,20 @@ public class SyntheticData {
 	}
 
 	/**
-	 * Generate 150 taxi locations randomly on a unit square. Next, choose
-	 * half of these 150 taxi locations to be request locations as well
-	 * (that gives you 75 request points identical to taxi locations). The
-	 * remaining 75 request locations can be chosen randomly from the unit
-	 * square.
+	 * Generates 2D synthetic data set based on this example from Dr.
+	 * Raghvendra:
+	 * 
+	 * Generate 150 taxi locations randomly on a unit square. Next, choose half
+	 * of these 150 taxi locations to be request locations as well (that gives
+	 * you 75 request points identical to taxi locations). The remaining 75
+	 * request locations can be chosen randomly from the unit square.
+	 * 
+	 * Generates a cost matrix based on distance provided by the distance
+	 * formula
+	 * 
+	 * @param numSetA
+	 *            The number of taxis (nodes in set A)
+	 * @return Cost matrix of the data
 	 */
 	public double[][] generateSynthetic2DExample2(int nodeSize) {
 		Random randSetA = new Random();

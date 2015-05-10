@@ -7,27 +7,46 @@ import java.util.Collections;
 import java.util.Iterator;
 
 /**
- * Computes the smallest cost matching of a bipartite graph using the Bellman
- * Ford algorithm. Also can be used to verify solution with Hungarian algorithm.
+ * Computes the smallest cost matching (online, offline and greedy) of a
+ * bipartite graph using the Bellman Ford algorithm. Also can be used to verify
+ * solution with Hungarian algorithm.
  * 
+ * @author Sanchit Chadha
+ * @author Divit Singh
  */
 public class BellmanFord {
 
+	// Constant multiplier to improve competitive ratio
 	private double constant = 1.0;
 
 	private UberObject[] taxis; // Set A
 	private UberObject[] customers; // Set B
 	private double[][] costMatrix; // Cost matrix where each element is distance
 
+	/**
+	 * Sets the constant multiplier that improves competitive ratio
+	 * 
+	 * @param constant
+	 *            The constant value to be set
+	 */
 	public void setConstant(double constant) {
 		this.constant = constant;
 	}
 
-	public ArrayList<Integer> permuteDestinations(int nodesToRead) {
+	/**
+	 * Generates a randomized list of request or destination indices for the
+	 * online algorithm to utilize.
+	 * 
+	 * @param numSetA
+	 *            The number of taxis (nodes in set A)
+	 * @return A randomized ArrayList of destination indices: numSetA <= i <
+	 *         numSetA*2
+	 */
+	public ArrayList<Integer> permuteDestinations(int numSetA) {
 
 		ArrayList<Integer> destinationIndices = new ArrayList<Integer>();
 
-		for (int i = nodesToRead; i < nodesToRead * 2; i++) {
+		for (int i = numSetA; i < numSetA * 2; i++) {
 			destinationIndices.add(i);
 		}
 
@@ -36,42 +55,64 @@ public class BellmanFord {
 		return destinationIndices;
 	}
 
-	public void generateCostMatrix(String filename, int nodesToRead) {
-		switch (filename) {
+	/**
+	 * Generates a cost matrix based on what data source type is given.
+	 * 
+	 * @param dataSource
+	 *            The type of data source. ("trip_data_test.csv", "synthetic1D",
+	 *            "synthetic2D", "synthetic2DExample", "synthetic2DExample2")
+	 * @param numSetA
+	 *            The number of taxis (nodes in set A)
+	 */
+	public void generateCostMatrix(String dataSource, int numSetA) {
+		switch (dataSource) {
 		case "synthetic1D":
-			costMatrix = new SyntheticData().generateSynthetic1D(nodesToRead);
+			costMatrix = new SyntheticData().generateSynthetic1D(numSetA);
 			break;
 		case "synthetic2D":
-			costMatrix = new SyntheticData().generateSynthetic2D(nodesToRead);
+			costMatrix = new SyntheticData().generateSynthetic2D(numSetA);
 			break;
-		case "synthetic2DExample":
-			costMatrix = new SyntheticData().generateSynthetic2DExample(nodesToRead);
+		case "synthetic2DExample1":
+			costMatrix = new SyntheticData().generateSynthetic2DExample(numSetA);
 			break;
 		case "synthetic2DExample2":
-			costMatrix = new SyntheticData().generateSynthetic2DExample2(nodesToRead);
+			costMatrix = new SyntheticData().generateSynthetic2DExample2(numSetA);
 			break;
 		default:
-			parseData(filename, nodesToRead);
+			parseData(dataSource, numSetA);
 			computeCostMatrix();
 			break;
 		}
 	}
 
-	public double execute(int nodesToRead, String type, ArrayList<Integer> destinationIndices) {
+	/**
+	 * Executes an algorithm based on the type specified.
+	 * 
+	 * @param numSetA
+	 *            The number of taxis (nodes in set A)
+	 * @param type
+	 *            The type of algorithm to execute. ("hungarian", "offline",
+	 *            "online" or "greedy")
+	 * @param destinationIndices
+	 *            The ArrayList of randomized destination indices
+	 * @return The total net cost of the best matching based on the type of
+	 *         algorithm executed.
+	 */
+	public double execute(int numSetA, String type, ArrayList<Integer> destinationIndices) {
 		double result = 0.0;
 
 		switch (type) {
 		case "hungarian":
-			result = verifyHungarian(nodesToRead);
+			result = verifyHungarian();
 			break;
 		case "offline":
-			result = computeOfflineMatching(nodesToRead);
+			result = computeOfflineMatching(numSetA);
 			break;
 		case "online":
-			result = computeOnlineMatching(nodesToRead, destinationIndices);
+			result = computeOnlineMatching(numSetA, destinationIndices);
 			break;
 		case "greedy":
-			result = computeGreedyMatching(nodesToRead, destinationIndices);
+			result = computeGreedyMatching(numSetA, destinationIndices);
 			break;
 		}
 		return result;
@@ -80,14 +121,12 @@ public class BellmanFord {
 
 	/**
 	 * Computes the smallest cost matching using the Hungarian algorithm. For
-	 * verifying purposes.
+	 * verification purposes.
 	 * 
-	 * @param filename
-	 *            Name of dataset file.
-	 * @param nodesToRead
-	 *            Number of nodes/vertices in Set A.
+	 * @return The net total cost of the optimal matching found by executing
+	 *         Hungarian algorithm.
 	 */
-	public double verifyHungarian(int nodesToRead) {
+	public double verifyHungarian() {
 		HungarianAlgorithm test = new HungarianAlgorithm(costMatrix);
 
 		int[] tester = test.execute();
@@ -95,7 +134,6 @@ public class BellmanFord {
 		for (int i = 0; i < tester.length; i++) {
 			totalCost += costMatrix[i][tester[i]];
 		}
-		System.out.println("COST: " + totalCost);
 
 		return totalCost;
 	}
@@ -106,8 +144,10 @@ public class BellmanFord {
 	 * 
 	 * @param filename
 	 *            Name of dataset file.
-	 * @param nodesToRead
-	 *            Number of nodes/vertices in Set A.
+	 * @param numSetA
+	 *            The number of taxis (nodes in set A)
+	 * 
+	 * @return The total net cost of the best offline matching
 	 */
 	public double computeOfflineMatching(int numSetA) {
 		// Final offline matching ArrayList of directed edges
@@ -146,11 +186,12 @@ public class BellmanFord {
 		 * paths are processed to choose the minimum cost and to also check for
 		 * negative cycles. If a negative cycle occurs on the node, then add it
 		 * to the negativeCycleIndex ArrayList and move on to the next source
-		 * node. Else, the minimum cost path is chosen. The best path is added
-		 * to an ArrayList bestPath and a new DiGraph is constructed with the
-		 * best cost matching and the previous matchings. This new edge matching
-		 * is added to the matchings ArrayList and the original DiGraph is
-		 * updated with this new DiGraph. The process is repeated.
+		 * node. Else, the minimum cost path is chosen. The best path
+		 * (augmenting or direct path) is added to an ArrayList bestPath and a
+		 * new DiGraph is constructed with the best cost matching and the
+		 * previous matchings. This new edge matching is added to the matchings
+		 * ArrayList and the original DiGraph is updated with this new DiGraph.
+		 * The process is repeated.
 		 * 
 		 * If negative cycles occurred during the processing, an additional
 		 * iteration over the negativeCycleIndex ArrayList is ran to process
@@ -181,16 +222,20 @@ public class BellmanFord {
 			// Obtain minimum cost path
 			for (int v = numSetA; v < original.V(); v++) {
 
+				// If vertex is already in the matching, skip it
 				if (matching.contains(v)) {
 					continue;
 				}
 
+				// Check if vertex causes a negative cycle
 				if (sp.hasNegativeCycle()) {
 					negativeCycleIndex.add(index);
 					index++;
 					break;
 				}
 
+				// Check if a path exists from source vertex to destination
+				// vertex v
 				if (sp.hasPathTo(v)) {
 					if (sp.distTo(v) < minPath) {
 						minPath = sp.distTo(v);
@@ -225,8 +270,6 @@ public class BellmanFord {
 							matching.add(e.to());
 						}
 					}
-					// totalCost += e.weight();
-
 				} else {
 					nextIterationGraph.addEdge(e);
 				}
@@ -255,7 +298,17 @@ public class BellmanFord {
 		return totalCost;
 	}
 
-	// TODO
+	/**
+	 * Computes the smallest cost matching using the Bellman ford algorithm in
+	 * the online setting.
+	 * 
+	 * @param numSetA
+	 *            The number of taxis (nodes in set A)
+	 * @param destinationIndices
+	 *            The ArrayList of randomized destination indices
+	 * 
+	 * @return The total net cost of the best offline matching
+	 */
 	public double computeOnlineMatching(int numSetA, ArrayList<Integer> destinationIndices) {
 		// Final online matching ArrayList of directed edges
 		ArrayList<DirectedEdge> onlineMatching = new ArrayList<DirectedEdge>();
@@ -278,13 +331,30 @@ public class BellmanFord {
 
 		/*
 		 * Core of the algorithm
+		 * 
+		 * Algorithm repeats until matching is perfect. BellmanFord is ran from
+		 * all nodes in setA to the single incoming node decided by the
+		 * destinationIndices ArrayList. The shortest path from a node in setA
+		 * to the incoming node in setB is chosen and a new DiGraph is
+		 * constructed with that matching. This path can be a direct path or an
+		 * augmenting path which causes the cost of previously matched edges to
+		 * be positive and the cost of the new matched edges to be negative.
+		 * This allows BellmanFord to calculate the legitimate best augmented
+		 * path. The online matching ArrayList has the source and destination
+		 * index and the original cost of that source/destination edge stored in
+		 * it instead of the actual cost of the augmented path. Negative cycles
+		 * are not processed for the online setting.
 		 */
 		while (matching.size() < numSetA) {
 
+			// The index of the incoming request
 			int destinationIndex = destinationIndices.get(index);
 
-			tempMatrix = normalizeMatrix(destinationIndex - numSetA, tempMatrix, true);
+			// Normalized matrix where all the costs of the incoming request to
+			// each taxi are revealed
+			tempMatrix = normalizeMatrix(destinationIndex - numSetA, tempMatrix);
 
+			// DiGraph of the normalized matrix
 			original = constructDigraphFromMatrix(tempMatrix);
 
 			ArrayList<DirectedEdge> bestPath = new ArrayList<DirectedEdge>();
@@ -292,6 +362,8 @@ public class BellmanFord {
 
 			double minPath = Double.MAX_VALUE;
 
+			// Checks each source index to the incoming destination index for a
+			// path and stores the minimum path.
 			for (int source : sourceIndices) {
 
 				if (matching.contains(source)) {
@@ -314,6 +386,7 @@ public class BellmanFord {
 				bestPath.add(iter.next());
 			}
 
+			// The source and destination index from the best path
 			int source = bestPath.get(0).from();
 			int destination = bestPath.get(bestPath.size() - 1).to();
 
@@ -321,15 +394,20 @@ public class BellmanFord {
 			EdgeWeightedDigraph nextIterationGraph = new EdgeWeightedDigraph(numSetA
 					+ costMatrix[index].length);
 
-			// Update matchings and new DiGraph
+			// Update matchings and new DiGraph. Checks each edge from the
+			// original digraph
 			for (DirectedEdge e : original.edges()) {
 				DirectedEdge edgeToAdd = null;
 				// If this edge is part of the matching
 				if (containsEdge(bestPath, e)) {
 
+					// If the edge is already matched, make the weight positive
+					// and multiple by constant to get the weighted cost back
 					if (e.weight() < 0.0) {
 						edgeToAdd = new DirectedEdge(e.to(), e.from(), -1.0 * constant * e.weight());
 					} else {
+						// Else negate the weight and divide by the constant so
+						// Bellman Ford can calculate the correct cost
 						edgeToAdd = new DirectedEdge(e.to(), e.from(), (-1.0 * e.weight())
 								/ constant);
 					}
@@ -337,6 +415,8 @@ public class BellmanFord {
 					nextIterationGraph.addEdge(edgeToAdd);
 					if (edgeToAdd.weight() <= 0.0) {
 						if (!matching.contains(e.from())) {
+							// Add only new matched edges to the online
+							// matching. No duplicates.
 							matching.add(e.from());
 
 							onlineMatching.add(new DirectedEdge(destination, source,
@@ -344,11 +424,13 @@ public class BellmanFord {
 						}
 					}
 				} else {
+					// Add all updated edges to the next iteration graph
 					edgeToAdd = new DirectedEdge(e.from(), e.to(), e.weight());
 					nextIterationGraph.addEdge(edgeToAdd);
 				}
 
-				// Update matrix values accordingly
+				// Update temp matrix values according to the matching changes
+				// made above
 				int x = edgeToAdd.from();
 				int y = edgeToAdd.to();
 
@@ -359,6 +441,7 @@ public class BellmanFord {
 				}
 
 			}
+			// Increments index to get the next destination node
 			index++;
 		}
 
@@ -368,9 +451,26 @@ public class BellmanFord {
 
 	}
 
+	/**
+	 * Computes the greedy matching for a given cost matrix. Simply goes down
+	 * the column of the cost matrix based on the order dictated by the
+	 * destinationIndices ArrayList and finds the lowest cost element that is
+	 * not already in the matching. Adds that edge to the matching and
+	 * continues.
+	 * 
+	 * @param numSetA
+	 *            The number of taxis (nodes in set A)
+	 * @param destinationIndices
+	 *            The ArrayList of randomized destination indices
+	 * @return The total net cost of the greedy matching
+	 */
 	public double computeGreedyMatching(int numSetA, ArrayList<Integer> destinationIndices) {
+		// Final greedy matching
 		ArrayList<DirectedEdge> matching = new ArrayList<DirectedEdge>();
+
+		// Store set A node indices that are in the matching
 		ArrayList<Integer> fromMatchings = new ArrayList<Integer>();
+
 		// Index of the current source node being processed
 		int index = 0;
 
@@ -399,9 +499,25 @@ public class BellmanFord {
 		return totalCost;
 	}
 
-	public boolean edgeEquals(DirectedEdge e, DirectedEdge edge) {
+	/**
+	 * Helper method that checks if two DirectedEdges are equal to each other.
+	 * To, from and weight attributes must equal in both objects.
+	 * 
+	 * @param edge1
+	 *            First directed edge
+	 * @param edge2
+	 *            Second directed edge
+	 * @return True if all attributes are equal in both edges. False if either
+	 *         edge is null or attributes don't match.
+	 */
+	public boolean edgeEquals(DirectedEdge edge1, DirectedEdge edge2) {
 
-		if (e.to() == edge.to() && e.from() == edge.from() && e.weight() == edge.weight()) {
+		if (edge1.equals(null) || edge2.equals(null)) {
+			return false;
+		}
+
+		if (edge1.to() == edge2.to() && edge1.from() == edge2.from()
+				&& edge1.weight() == edge2.weight()) {
 			return true;
 		}
 
@@ -409,10 +525,31 @@ public class BellmanFord {
 	}
 
 	/**
-	 * Calculates the total net cost of the matching computed by Bellman Ford
+	 * Helper method that checks if an ArrayList of DirectedEdges contains an
+	 * edge.
+	 * 
+	 * @param list
+	 *            The list of DirectedEdges that may or may not contain the edge
+	 * @param edge
+	 *            The edge to check if it is contained in the list
+	 * @return True if the list contains edge, false otherwise.
+	 */
+	public boolean containsEdge(ArrayList<DirectedEdge> list, DirectedEdge edge) {
+		for (DirectedEdge e : list) {
+			if (edgeEquals(e, edge)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Calculates the total net cost of the matching computed by the selected
+	 * algorithm
 	 * 
 	 * @param matching
-	 *            The edges in the matching from Bellman Ford
+	 *            The edges in the matching from running the selected algorithm
 	 * @return Total net cost of the matching
 	 */
 	public double calculateTotalCost(ArrayList<DirectedEdge> matching) {
@@ -443,6 +580,13 @@ public class BellmanFord {
 		return elementList;
 	}
 
+	/**
+	 * Generates a 2D array of doubles with all elements initialized to a large
+	 * number (100000.0). This is to ensure that the online algorithm only takes
+	 * the incoming request costs in consideration and none of the other nodes.
+	 * 
+	 * @return The initialized 2D array of doubles
+	 */
 	private double[][] generateInitialMatrix() {
 		double[][] tempMatrix = new double[costMatrix.length][costMatrix.length];
 
@@ -454,30 +598,29 @@ public class BellmanFord {
 		return tempMatrix;
 	}
 
-	private double[][] normalizeMatrix(int column, double[][] tempMatrix, boolean hasConstant) {
+	/**
+	 * Normalizes the matrix. Updates the given column to match the same values
+	 * as the ones found in the original cost matrix. This replicates the
+	 * behavior of an incoming request and the costs associated between the
+	 * request and each available taxi. This method also multiplies the initial
+	 * cost by a constant. So all incoming requests have a constant multiplied
+	 * cost, but when an edge gets matched, the cost associated with that edge
+	 * is divided by that constant. This is a modification that Dr. Raghvendra
+	 * came up with to improve the competitive ratio in online settings.
+	 * 
+	 * @param column
+	 *            The index of the column that represents an incoming request.
+	 * @param tempMatrix
+	 *            The temporary matrix that gets updated based on an incoming
+	 *            request.
+	 * @return The updated matrix with an incoming request and its costs
+	 *         processed.
+	 */
+	private double[][] normalizeMatrix(int column, double[][] tempMatrix) {
 		for (int i = 0; i < tempMatrix.length; i++) {
-			for (int j = 0; j < tempMatrix[i].length; j++) {
-				if (/* tempMatrix[i][j] == 100000.0 && */j == column) {
-					if (hasConstant) {
-						tempMatrix[i][j] = constant * costMatrix[i][j];
-					} else {
-						tempMatrix[i][j] = costMatrix[i][j];
-					}
-
-				}
-			}
+			tempMatrix[i][column] = constant * costMatrix[i][column];
 		}
 		return tempMatrix;
-	}
-
-	public boolean containsEdge(ArrayList<DirectedEdge> list, DirectedEdge edge) {
-		for (DirectedEdge e : list) {
-			if (e.to() == edge.to() && e.from() == edge.from() && e.weight() == edge.weight()) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
