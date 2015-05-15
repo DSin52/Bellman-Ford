@@ -22,6 +22,10 @@ public class BellmanFord {
 	private UberObject[] taxis; // Set A
 	private UberObject[] customers; // Set B
 	private double[][] costMatrix; // Cost matrix where each element is distance
+	
+	//Heuristic flags for evaluation
+	private static final boolean HEURISTIC_COEFFICIENT_LINE = true; 
+	
 
 	/**
 	 * Sets the constant multiplier that improves competitive ratio
@@ -618,7 +622,7 @@ public class BellmanFord {
 	 */
 	private double[][] normalizeMatrix(int column, double[][] tempMatrix) {
 		for (int i = 0; i < tempMatrix.length; i++) {
-			tempMatrix[i][column] = constant * costMatrix[i][column];
+			tempMatrix[i][column] = !HEURISTIC_COEFFICIENT_LINE ? constant * costMatrix[i][column] : SyntheticData.coefficientMapping[i][column] * costMatrix[i][column];
 		}
 		return tempMatrix;
 	}

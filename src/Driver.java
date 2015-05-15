@@ -16,7 +16,7 @@ import java.util.Calendar;
 public class Driver {
 
 	public static void main(String[] args) {
-		generateSingleRun(150, "synthetic2D", 3.0);
+		generateSingleRun(100, "synthetic1D", 3.0);
 		// generateChartResults(150, "synthetic2D");
 	}
 

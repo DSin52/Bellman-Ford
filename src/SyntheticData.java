@@ -6,6 +6,8 @@ import java.util.Random;
  * Generates random synthetic 1D and 2D data and the associated cost matrix.
  */
 public class SyntheticData {
+	
+	public static int[][] coefficientMapping;
 
 	/**
 	 * Generates 1D synthetic data and creates a cost matrix. Picks a random
@@ -18,6 +20,8 @@ public class SyntheticData {
 	 * @return Cost matrix of the data
 	 */
 	public double[][] generateSynthetic1D(int numSetA) {
+		
+		coefficientMapping = new int[numSetA][numSetA];
 
 		Random randSetA = new Random();
 		Random randSetB = new Random();
@@ -45,6 +49,12 @@ public class SyntheticData {
 					continue;
 				}
 				break;
+			}
+		}
+		
+		for (int i = 0; i < numSetA; i++) {
+			for (int j = 0; j < numSetA; j++) {
+				coefficientMapping[i][j] = setA.get(i) < setB.get(j) ? 3 : 6;
 			}
 		}
 
