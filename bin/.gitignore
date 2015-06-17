@@ -1,7 +1,11 @@
 /BellmanFord.class
+/DijkstraSolver.class
 /Distance.class
 /Driver.class
 /Element.class
+/Graph$Edge.class
+/Graph$Vertex.class
+/Graph.class
 /HungarianAlgorithm.class
 /SyntheticData.class
 /UberObject.class

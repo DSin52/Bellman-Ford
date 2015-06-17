@@ -160,15 +160,8 @@ public class BellmanFord {
 		// Temporary matching ArrayList of Set B values for internal management
 		ArrayList<Integer> matching = new ArrayList<Integer>();
 
-		// ArrayList that stores all negative cycle indices for repeated
-		// processing
-		ArrayList<Integer> negativeCycleIndex = new ArrayList<Integer>();
-
 		// Index of the current source node being processed
 		int index = 0;
-
-		// Boolean value that is set to true
-		boolean runNegativeCycleIndices = false;
 
 		// Construct a DiGraph from the original costmatrix
 		EdgeWeightedDigraph original = constructDigraphFromMatrix(costMatrix);
@@ -204,61 +197,15 @@ public class BellmanFord {
 		while (matching.size() < numSetA) {
 
 			if (index == numSetA) { // Last source index to process?
-				if (negativeCycleIndex.size() > 0) { // Negative cycles to
-														// process?
-					index = negativeCycleIndex.remove(0);
-					runNegativeCycleIndices = true;
-				} else {
-					break; // All processing complete
-				}
+				break;
 			}
 
 			int source = sourceIndices.get(index);
 
-			// Run BellmanFord algorithm on source index
-			BellmanFordSP sp = new BellmanFordSP(original, source);
-
-			Iterator<DirectedEdge> iter = null;
 			ArrayList<DirectedEdge> bestPath = new ArrayList<DirectedEdge>();
-
-			double minPath = Double.MAX_VALUE;
-
 			// Obtain minimum cost path
-			for (int v = numSetA; v < original.V(); v++) {
-
-				// If vertex is already in the matching, skip it
-				if (matching.contains(v)) {
-					continue;
-				}
-
-				// Check if vertex causes a negative cycle
-				if (sp.hasNegativeCycle()) {
-					negativeCycleIndex.add(index);
-					index++;
-					break;
-				}
-
-				// Check if a path exists from source vertex to destination
-				// vertex v
-				if (sp.hasPathTo(v)) {
-					if (sp.distTo(v) < minPath) {
-						minPath = sp.distTo(v);
-						iter = sp.pathTo(v).iterator();
-					}
-				}
-			}
-
-			// Negative cycle detected, don't process current index
-			if (iter == null) {
-				if (runNegativeCycleIndices) {
-					index = numSetA;
-				}
-				continue;
-			}
-
-			while (iter.hasNext()) {
-				bestPath.add(iter.next());
-			}
+			//min path from dijkstra
+			//populate bestpath
 
 			// New iteration DiGraph that will have updated edges
 			EdgeWeightedDigraph nextIterationGraph = new EdgeWeightedDigraph(numSetA
@@ -281,13 +228,7 @@ public class BellmanFord {
 
 			original = nextIterationGraph;
 
-			// Increment index if not processing negative cycles, else set index
-			// to last source node
-			if (!runNegativeCycleIndices) {
-				index++;
-			} else {
-				index = numSetA;
-			}
+			index++;
 		}
 
 		// Add all matched edges to offline matching with proper weight
