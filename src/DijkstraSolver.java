@@ -10,22 +10,33 @@ import java.util.*;
  * other nodes
  */
 public class DijkstraSolver {
-	/*
-	 * private static final Graph.Edge[] GRAPH1 = { new Graph.Edge("a", "b", 7),
-	 * new Graph.Edge("a", "c", 9), new Graph.Edge("a", "f", 14), new
-	 * Graph.Edge("b", "c", 10), new Graph.Edge("b", "d", 15), new
-	 * Graph.Edge("c", "d", 11), new Graph.Edge("c", "f", 2), new
-	 * Graph.Edge("d", "e", 6), new Graph.Edge("e", "f", 9), };
-	 */
+
+	//testing only
+	private static final Graph.Edge[] GRAPH1 = { new Graph.Edge(1, 2, 7),
+			new Graph.Edge(1, 3, 9), new Graph.Edge(1, 6, 14),
+			new Graph.Edge(2, 3, 10), new Graph.Edge(2, 4, 15),
+			new Graph.Edge(3, 4, 11), new Graph.Edge(3, 6, 2),
+			new Graph.Edge(4, 5, 6), new Graph.Edge(5, 6, 9), };
 
 	public static Graph.Edge[] graph;
 
-	public static ArrayList<ArrayList<String>> execD(Graph.Edge[] curGraph,
-			String source) {
+	public static ArrayList<ArrayList<DirectedEdge>> execD(Graph.Edge[] curGraph,
+			int source) {
 		graph = curGraph;
 		Graph g = new Graph(graph);
 		g.dijkstra(source);
 		return g.printAllPaths();
 	}
-}
 
+	public static void main(String args[]) {
+		// testing only
+		Graph g = new Graph(GRAPH1);
+		g.dijkstra(1);
+		ArrayList<ArrayList<DirectedEdge>> temp = g.printAllPaths();
+		System.out.println(temp.size());
+		for (int i = 0; i < temp.size(); i++) {
+			System.out.println(temp.get(i).size());
+			System.out.println(temp.get(i).toString());
+		}
+	}
+}

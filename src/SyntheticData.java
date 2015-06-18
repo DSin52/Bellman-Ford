@@ -8,7 +8,7 @@ import java.util.Random;
 public class SyntheticData {
 	
 	public static int[][] coefficientMapping;
-
+	
 	/**
 	 * Generates 1D synthetic data and creates a cost matrix. Picks a random
 	 * integer between 0 and 10000 and adds it to setA (no repeats). Same thing

@@ -14,16 +14,16 @@ import java.util.TreeSet;
  * other nodes
  */
 public class Graph {
-	private final Map<String, Vertex> graph; // mapping of vertex names to
+	private final Map<Integer, Vertex> graph; // mapping of vertex names to
 												// Vertex objects, built from a
 												// set of Edges
 
 	/** One edge of the graph (only used by Graph constructor) */
 	public static class Edge {
-		public final String v1, v2;
-		public final int dist;
+		public final int v1, v2;
+		public final double dist;
 
-		public Edge(String v1, String v2, int dist) {
+		public Edge(int v1, int v2, double dist) {
 			this.v1 = v1;
 			this.v2 = v2;
 			this.dist = dist;
@@ -32,29 +32,29 @@ public class Graph {
 
 	/** One vertex of the graph, complete with mappings to neighbouring vertices */
 	public static class Vertex implements Comparable<Vertex> {
-		public final String name;
-		public int dist = Integer.MAX_VALUE; // MAX_VALUE assumed to be infinity
+		public final int name;
+		public double dist = Double.MAX_VALUE; // MAX_VALUE assumed to be infinity
 		public Vertex previous = null;
-		public final Map<Vertex, Integer> neighbours = new HashMap<>();
+		public final Map<Vertex, Double> neighbours = new HashMap<>();
 
-		public Vertex(String name) {
+		public Vertex(int name) {
 			this.name = name;
 		}
 
-		private ArrayList<String> printPath() {
-			ArrayList<String> curPath = new ArrayList<String>();
+		private ArrayList<DirectedEdge> printPath() {
+			ArrayList<DirectedEdge> curPath = new ArrayList<DirectedEdge>();
 			Vertex v = this;
 			while (v != v.previous) {
-				curPath.add(v.name + "(" + v.dist + ")");
+				DirectedEdge e = new DirectedEdge(v.previous.name, v.name, v.dist);
+				curPath.add(e);
 				v = v.previous;
 			}
-			curPath.add(this.name);
 			Collections.reverse(curPath);
 			return curPath;
 		}
 
 		public int compareTo(Vertex other) {
-			return Integer.compare(dist, other.dist);
+			return Double.compare(dist, other.dist);
 		}
 	}
 
@@ -73,13 +73,11 @@ public class Graph {
 		// another pass to set neighbouring vertices
 		for (Edge e : edges) {
 			graph.get(e.v1).neighbours.put(graph.get(e.v2), e.dist);
-			// graph.get(e.v2).neighbours.put(graph.get(e.v1), e.dist); // also
-			// do this for an undirected graph
 		}
 	}
 
 	/** Runs dijkstra using a specified source vertex */
-	public void dijkstra(String startName) {
+	public void dijkstra(int startName) {
 		if (!graph.containsKey(startName)) {
 			System.err.printf("Graph doesn't contain start vertex \"%s\"\n",
 					startName);
@@ -110,10 +108,10 @@ public class Graph {
 						// since they are unreachable
 
 			// look at distances to each neighbour
-			for (Map.Entry<Vertex, Integer> a : u.neighbours.entrySet()) {
+			for (Map.Entry<Vertex, Double> a : u.neighbours.entrySet()) {
 				v = a.getKey(); // the neighbour in this iteration
 
-				final int alternateDist = u.dist + a.getValue();
+				final double alternateDist = u.dist + a.getValue();
 				if (alternateDist < v.dist) { // shorter path to neighbour found
 					q.remove(v);
 					v.dist = alternateDist;
@@ -124,34 +122,15 @@ public class Graph {
 		}
 	}
 
-	/**
-	 * Prints a path from the source to the specified vertex
-	 * 
-	 * @return
-	 * @return
-	 */
-	public ArrayList<String> printPath(String endName) {
-		if (!graph.containsKey(endName)) {
-			System.err.printf("Graph doesn't contain end vertex \"%s\"\n",
-					endName);
-			return null;
-		}
-
-		return (graph.get(endName).printPath());
-
-	}
 
 	/**
 	 * Prints the path from the source to every vertex (output order is not
 	 * guaranteed)
 	 */
-	public ArrayList<ArrayList<String>> printAllPaths() {
-		ArrayList<ArrayList<String>> allPaths = new ArrayList<ArrayList<String>>();
+	public ArrayList<ArrayList<DirectedEdge>> printAllPaths() {
+		ArrayList<ArrayList<DirectedEdge>> allPaths = new ArrayList<ArrayList<DirectedEdge>>();
 		for (Vertex v : graph.values()) {
 			allPaths.add(v.printPath());
-		}
-		for (int i = 0; i < allPaths.size(); i++) {
-			System.out.println(allPaths.get(i).toString());
 		}
 		return allPaths;
 	}
