@@ -45,6 +45,9 @@ public class Graph {
 			ArrayList<DirectedEdge> curPath = new ArrayList<DirectedEdge>();
 			Vertex v = this;
 			while (v != v.previous) {
+				if (v.previous == null) {
+					break;
+				}
 				DirectedEdge e = new DirectedEdge(v.previous.name, v.name, v.dist);
 				curPath.add(e);
 				v = v.previous;

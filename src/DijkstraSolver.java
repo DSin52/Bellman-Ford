@@ -31,12 +31,12 @@ public class DijkstraSolver {
 	public static void main(String args[]) {
 		// testing only
 		Graph g = new Graph(GRAPH1);
-		g.dijkstra(1);
+		g.dijkstra(2);
 		ArrayList<ArrayList<DirectedEdge>> temp = g.printAllPaths();
-		System.out.println(temp.size());
-		for (int i = 0; i < temp.size(); i++) {
-			System.out.println(temp.get(i).size());
-			System.out.println(temp.get(i).toString());
-		}
+		//System.out.println(temp.size());
+		//for (int i = 0; i < temp.size(); i++) {
+		//	System.out.println(temp.get(i).size());
+		//	System.out.println(temp.get(i).toString());
+		//}
 	}
 }

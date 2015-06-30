@@ -16,7 +16,7 @@ import java.util.Calendar;
 public class Driver {
 
 	public static void main(String[] args) {
-		generateSingleRun(100, "synthetic1D", 3.0);
+		generateSingleRun(10, "synthetic1D", 3.0);
 		// generateChartResults(150, "synthetic2D");
 	}
 
@@ -31,7 +31,7 @@ public class Driver {
 	 * @param constant
 	 *            Constant multiplier to be used for better competitive ratio
 	 * 
-	 * <pre>
+	 *            <pre>
 	 * "trip_data_test.csv" - Uber Data Set
 	 * 
 	 * "synthetic1D" - Random points on a 1D line where distance
@@ -47,7 +47,8 @@ public class Driver {
 	 * "synthetic2DExample2" - {@link SyntheticData#generateSynthetic2DExample2(int)}
 	 * </pre>
 	 */
-	public static void generateSingleRun(int numNodes, String dataSource, double constant) {
+	public static void generateSingleRun(int numNodes, String dataSource,
+			double constant) {
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Calendar cal = Calendar.getInstance();
 		System.out.println("Start: " + dateFormat.format(cal.getTime()));
@@ -58,12 +59,17 @@ public class Driver {
 		bell.setConstant(constant);
 		bell.generateCostMatrix(dataSource, numNodes);
 
-		ArrayList<Integer> destinationOrder = bell.permuteDestinations(numNodes);
-		System.out.println("Destination Index Order: " + destinationOrder.toString());
+		ArrayList<Integer> destinationOrder = bell
+				.permuteDestinations(numNodes);
+		System.out.println("Destination Index Order: "
+				+ destinationOrder.toString());
 
-		double offlineCost = bell.execute(numNodes, "offline", destinationOrder);
+		double offlineCost = bell
+				.execute(numNodes, "offline", destinationOrder);
+		System.out.println("----------------------------------------------");
 		double onlineCost = bell.execute(numNodes, "online", destinationOrder);
-		double onlineGreedyCost = bell.execute(numNodes, "greedy", destinationOrder);
+		double onlineGreedyCost = bell.execute(numNodes, "greedy",
+				destinationOrder);
 
 		System.out.println("OFFLINE COST: " + offlineCost);
 		System.out.println("ONLINE COST: " + onlineCost);
@@ -74,13 +80,14 @@ public class Driver {
 
 		System.out.println("Competitive Ratio between online and offline: "
 				+ onlineCompetetiveRatio);
-		System.out.println("Competitive Ratio between greedy online and offline: "
-				+ greedyCompetetiveRatio);
+		System.out
+				.println("Competitive Ratio between greedy online and offline: "
+						+ greedyCompetetiveRatio);
 
 		// HUNGARIAN
-		// double hungarianCost = bell.execute(numNodes, "hungarian",
-		// destinationOrder);
-		// System.out.println("HUNGARIAN COST: " + hungarianCost);
+		double hungarianCost = bell.execute(numNodes, "hungarian",
+				destinationOrder);
+		System.out.println("HUNGARIAN COST: " + hungarianCost);
 
 		cal = Calendar.getInstance();
 		System.out.println("End: " + dateFormat.format(cal.getTime()));
@@ -97,7 +104,7 @@ public class Driver {
 	 *            Type of data source to be used. (Same dataSource values as
 	 *            generateSingleRun)
 	 * 
-	 * <pre>
+	 *            <pre>
 	 * output
 	 * Each line represents a coefficient
 	 * Column 1: online competitive ratio for a coefficient
@@ -109,15 +116,19 @@ public class Driver {
 		Calendar cal = Calendar.getInstance();
 		System.out.println("Start: " + dateFormat.format(cal.getTime()));
 
-		Double[] coefficients = { 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 10.0, 25.0 };
+		Double[] coefficients = { 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 10.0,
+				25.0 };
 
 		BellmanFord bell = new BellmanFord();
 
-		ArrayList<Integer> destinationOrder = bell.permuteDestinations(numNodes);
+		ArrayList<Integer> destinationOrder = bell
+				.permuteDestinations(numNodes);
 		bell.generateCostMatrix(dataSource, numNodes);
 
-		double offlineCost = bell.execute(numNodes, "offline", destinationOrder);
-		double onlineGreedyCost = bell.execute(numNodes, "greedy", destinationOrder);
+		double offlineCost = bell
+				.execute(numNodes, "offline", destinationOrder);
+		double onlineGreedyCost = bell.execute(numNodes, "greedy",
+				destinationOrder);
 
 		for (int i = 0; i < coefficients.length; i++) {
 			bell.setConstant(coefficients[i]);
@@ -125,7 +136,8 @@ public class Driver {
 			double competetiveRatioGreedy = 0;
 
 			for (int j = 0; j < 5; j++) {
-				double onlineCost = bell.execute(numNodes, "online", destinationOrder);
+				double onlineCost = bell.execute(numNodes, "online",
+						destinationOrder);
 
 				competetiveRatioOnline += onlineCost / offlineCost;
 				competetiveRatioGreedy += onlineGreedyCost / offlineCost;

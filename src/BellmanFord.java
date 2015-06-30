@@ -24,7 +24,7 @@ public class BellmanFord {
 	private double[][] costMatrix; // Cost matrix where each element is distance
 
 	// Heuristic flags for evaluation
-	private static final boolean HEURISTIC_COEFFICIENT_LINE = true;
+	private static final boolean HEURISTIC_COEFFICIENT_LINE = false;
 
 	/**
 	 * Sets the constant multiplier that improves competitive ratio
@@ -143,7 +143,7 @@ public class BellmanFord {
 
 		return totalCost;
 	}
-	
+
 	public double[] initLabels(int numSetA) {
 		double[] labels = new double[numSetA];
 		for (int i = 0; i < numSetA; i++) {
@@ -174,7 +174,11 @@ public class BellmanFord {
 		int index = 0;
 
 		// Construct a DiGraph from the original costmatrix
-		EdgeWeightedDigraph original = constructDigraphFromMatrix(costMatrix);
+		EdgeWeightedDigraph original = constructDigraphFromMatrixDijkstra(costMatrix);
+		Iterator<DirectedEdge> iter2 = original.edges().iterator();
+		//for (int i = 0; i < original.E(); i++) {
+		//	System.out.println(iter2.next());
+		//}
 
 		ArrayList<Integer> sourceIndices = new ArrayList<Integer>();
 		for (int i = 0; i < numSetA; i++) {
@@ -183,7 +187,7 @@ public class BellmanFord {
 
 		// Randomizes the source node indices chosen for augmentation
 		Collections.shuffle(sourceIndices);
-		
+
 		double[] labelsR = initLabels(numSetA);
 		double[] labelsT = initLabels(numSetA);
 
@@ -211,13 +215,17 @@ public class BellmanFord {
 
 			if (index == numSetA) { // Last source index to process?
 				break;
+				// index = 0;
 			}
 
 			int source = sourceIndices.get(index);
+			if (matching.contains(source)) {
+				continue;
+			}
 
-			Graph.Edge[] curGraph = new Graph.Edge[numSetA
-					+ costMatrix[0].length];
+			Graph.Edge[] curGraph = new Graph.Edge[original.E()];
 			Iterator<DirectedEdge> iter = original.edges().iterator();
+
 			int cell = 0;
 			while (iter.hasNext()) {
 				DirectedEdge e = iter.next();
@@ -225,47 +233,66 @@ public class BellmanFord {
 				curGraph[cell] = ge;
 				cell++;
 			}
+			
 			ArrayList<ArrayList<DirectedEdge>> allPaths = DijkstraSolver.execD(
 					curGraph, source);
 			double min = Double.MAX_VALUE;
 			ArrayList<DirectedEdge> bestPath = new ArrayList<DirectedEdge>();
 			for (ArrayList<DirectedEdge> curPath : allPaths) {
-				if (curPath.get(curPath.size()-1).to() < numSetA || matching.contains(curPath.get(curPath.size()-1).to())) {
+				if (curPath.size() == 0
+						|| curPath.get(curPath.size() - 1).to() < numSetA
+						|| matching.contains(curPath.get(curPath.size() - 1)
+								.to())) {
 					continue;
 				}
-				if (curPath.size() > 0) {
-					double tempMin = curPath.get(curPath.size() - 1).weight();
-					if (tempMin > min) {
-						min = tempMin;
-						bestPath = curPath;
-					}
+				double distance = 0.0;
+				for (DirectedEdge e : curPath) {
+					distance += e.weight();
+				}
+				if (distance < min) {
+					min = distance;
+					bestPath = curPath;
 				}
 			}
-			for (int i = 1; i < bestPath.size(); i++) {
-				bestPath.set(i, new DirectedEdge(bestPath.get(i).from(),
-						bestPath.get(i).to(), bestPath.get(i).weight()
-								- bestPath.get(i - 1).weight()));
+			double L = min;
+			double L_Lv = 0.0;
+			for (int i = 0; i < allPaths.size(); i++) {
+				double curPathCost = 0.0;
+				for (int j = 0; j < allPaths.get(i).size(); j++) {
+					curPathCost += allPaths.get(i).get(j).weight();
+				}
+				if (curPathCost >= L || allPaths.get(i).size() == 0) {
+					continue;
+				}
+				L_Lv = L - curPathCost;
+				int v = allPaths.get(i).get(allPaths.get(i).size() - 1).to();
+				if (v > numSetA) {
+					labelsT[v % numSetA] += L_Lv;
+				} else {
+					labelsR[v % numSetA] -= L_Lv;
+				}
 			}
-
+			
 			// New iteration DiGraph that will have updated edges
 			EdgeWeightedDigraph nextIterationGraph = new EdgeWeightedDigraph(
 					numSetA + costMatrix[0].length);
 
-			//update next iteration graph and weights
+			// update next iteration graph and weights
 			for (DirectedEdge e : original.edges()) {
-				if (bestPath.contains(e)) {
-					DirectedEdge edgeToAdd = new DirectedEdge(e.to(), e.from(), e.weight() - labelsR[e.from()] - labelsT[e.to()]);
+				if (containsEdge(bestPath, e)) {
+					DirectedEdge edgeToAdd = new DirectedEdge(e.from(), e.to(),
+							e.weight());
 					nextIterationGraph.addEdge(edgeToAdd);
-					
-					//update labels - not sure here how to update
-					labelsR[e.from()] = labelsT[e.from()] + (1);
-				    labelsT[e.to()] = labelsT[e.to()] - (1);
-					
+
 					if (!matching.contains(e.to())) {
 						matching.add(e.to());
+						offlineMatching.add(new DirectedEdge(e.to(), e.from(),
+								costMatrix[e.from() % numSetA][e.to() % numSetA]));// edge.weight()));
 					}
 				} else {
-					nextIterationGraph.addEdge(e);
+					DirectedEdge edgeToAdd = new DirectedEdge(e.from(), e.to(),
+							e.weight());
+					nextIterationGraph.addEdge(edgeToAdd);
 				}
 			}
 
@@ -274,12 +301,12 @@ public class BellmanFord {
 		}
 
 		// Add all matched edges to offline matching with proper weight
-		for (DirectedEdge edge : original.edges()) {
-			if (edge.weight() < 0) {
-				offlineMatching.add(new DirectedEdge(edge.to(), edge.from(),
-						-1.0 * edge.weight()));
-			}
-		}
+		//for (DirectedEdge edge : original.edges()) {
+			// if (edge.weight() < 0) {
+		//	offlineMatching.add(new DirectedEdge(edge.to(), edge.from(),
+		//			costMatrix[edge.from() % numSetA][edge.to() % numSetA]));// edge.weight()));
+			// }
+		//}
 
 		double totalCost = calculateTotalCost(offlineMatching);
 
@@ -317,6 +344,9 @@ public class BellmanFord {
 
 		// Construct a DiGraph from the original costmatrix
 		EdgeWeightedDigraph original = null;
+		
+		double[] labelsR = initLabels(numSetA);
+		double[] labelsT = initLabels(numSetA);
 
 		/*
 		 * Core of the algorithm
@@ -347,9 +377,18 @@ public class BellmanFord {
 			original = constructDigraphFromMatrix(tempMatrix);
 
 			ArrayList<DirectedEdge> bestPath = new ArrayList<DirectedEdge>();
-			Iterator<DirectedEdge> iter = null;
 
 			double minPath = Double.MAX_VALUE;
+			
+			Graph.Edge[] curGraph = new Graph.Edge[original.E()];
+			Iterator<DirectedEdge> iter = original.edges().iterator();
+			int cell = 0;
+			while (iter.hasNext()) {
+				DirectedEdge e = iter.next();
+				Graph.Edge ge = new Graph.Edge(e.from(), e.to(), e.weight());
+				curGraph[cell] = ge;
+				cell++;
+			}
 
 			// Checks each source index to the incoming destination index for a
 			// path and stores the minimum path.
@@ -359,20 +398,42 @@ public class BellmanFord {
 					continue;
 				}
 
-				BellmanFordSP sp = new BellmanFordSP(original, source);
-
-				if (sp.hasPathTo(destinationIndex)) {
-					double distance = sp.distTo(destinationIndex);
-
-					if (distance < minPath) {
-						minPath = distance;
-						iter = sp.pathTo(destinationIndex).iterator();
+				ArrayList<ArrayList<DirectedEdge>> allPaths = DijkstraSolver.execD(
+						curGraph, source);
+				for (int i = 0; i < allPaths.size(); i++) {
+						if (allPaths.get(i).size() == 0) {
+							continue;
+						}
+						if (allPaths.get(i).get(allPaths.get(i).size()-1).to() == destinationIndex) {
+							double distance = 0.0;
+							for (DirectedEdge e : allPaths.get(i)) {
+								distance += e.weight();
+							}
+							if (distance < minPath) {
+								minPath = distance;
+								bestPath = allPaths.get(i);
+							}
+							break;
+						}
+				}
+				double L = minPath;
+				double L_Lv = 0.0;
+				for (int i = 0; i < allPaths.size(); i++) {
+					double curPathCost = 0.0;
+					for (int j = 0; j < allPaths.get(i).size(); j++) {
+						curPathCost += allPaths.get(i).get(j).weight();
+					}
+					if (curPathCost >= L || allPaths.get(i).size() == 0) {
+						continue;
+					}
+					L_Lv = L - curPathCost;
+					int v = allPaths.get(i).get(allPaths.get(i).size() - 1).to();
+					if (v > numSetA) {
+						labelsT[v % numSetA] += L_Lv;
+					} else {
+						labelsR[v % numSetA] -= L_Lv;
 					}
 				}
-			}
-
-			while (iter.hasNext()) {
-				bestPath.add(iter.next());
 			}
 
 			// The source and destination index from the best path
@@ -390,30 +451,20 @@ public class BellmanFord {
 				// If this edge is part of the matching
 				if (containsEdge(bestPath, e)) {
 
-					// If the edge is already matched, make the weight positive
-					// and multiple by constant to get the weighted cost back
-					if (e.weight() < 0.0) {
-						edgeToAdd = new DirectedEdge(e.to(), e.from(), -1.0
-								* constant * e.weight());
-					} else {
-						// Else negate the weight and divide by the constant so
-						// Bellman Ford can calculate the correct cost
 						edgeToAdd = new DirectedEdge(e.to(), e.from(),
-								(-1.0 * e.weight()) / constant);
-					}
-
+								(e.weight()));
+					
 					nextIterationGraph.addEdge(edgeToAdd);
-					if (edgeToAdd.weight() <= 0.0) {
+					//if (edgeToAdd.weight() <= 0.0) {
 						if (!matching.contains(e.from())) {
 							// Add only new matched edges to the online
 							// matching. No duplicates.
 							matching.add(e.from());
-
 							onlineMatching.add(new DirectedEdge(destination,
 									source, costMatrix[source][destination
 											- costMatrix[index].length]));
 						}
-					}
+					//}
 				} else {
 					// Add all updated edges to the next iteration graph
 					edgeToAdd = new DirectedEdge(e.from(), e.to(), e.weight());
@@ -434,6 +485,7 @@ public class BellmanFord {
 			}
 			// Increments index to get the next destination node
 			index++;
+			
 		}
 
 		double totalCost = calculateTotalCost(onlineMatching);
@@ -641,6 +693,33 @@ public class BellmanFord {
 			} else {
 				edge = new DirectedEdge(ele.getX(), ele.getY(), ele.getWeight());
 			}
+			diGraph.addEdge(edge);
+		}
+		return diGraph;
+	}
+
+	/**
+	 * Builds the EdgeWeightedDigraph when given a cost matrix
+	 * 
+	 * @param costMatrix
+	 *            A simple 2-D array representing the costs between edges
+	 * @return The EdgeWeightedDigraph; simply a bipartite graph with all
+	 *         vertices, edges and weights associated in one data structure
+	 */
+	public static EdgeWeightedDigraph constructDigraphFromMatrixDijkstra(
+			double[][] costMatrix) {
+		EdgeWeightedDigraph diGraph = new EdgeWeightedDigraph(costMatrix.length
+				+ costMatrix[0].length);
+		ArrayList<Element> elements = buildElementMatrix(costMatrix);
+
+		for (Element ele : elements) {
+			DirectedEdge edge = null;
+			// if (ele.getWeight() < 0) {
+			edge = new DirectedEdge(ele.getY(), ele.getX(), ele.getWeight());
+			diGraph.addEdge(edge);
+			// } else {
+			edge = new DirectedEdge(ele.getX(), ele.getY(), ele.getWeight());
+			// }
 			diGraph.addEdge(edge);
 		}
 		return diGraph;
