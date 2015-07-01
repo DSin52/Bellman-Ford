@@ -67,22 +67,36 @@ public class Driver {
 		double offlineCost = bell
 				.execute(numNodes, "offline", destinationOrder);
 		System.out.println("----------------------------------------------");
+		double offlineCostD = bell
+				.execute(numNodes, "offline-D", destinationOrder);
 		double onlineCost = bell.execute(numNodes, "online", destinationOrder);
+		double onlineCostD = bell.execute(numNodes, "online-D", destinationOrder);
 		double onlineGreedyCost = bell.execute(numNodes, "greedy",
 				destinationOrder);
 
 		System.out.println("OFFLINE COST: " + offlineCost);
 		System.out.println("ONLINE COST: " + onlineCost);
+		System.out.println("OFFLINE COST-D: " + offlineCostD);
+		System.out.println("ONLINE COST-D: " + onlineCostD);
 		System.out.println("GREEDY COST: " + onlineGreedyCost);
 
 		double onlineCompetetiveRatio = onlineCost / offlineCost;
 		double greedyCompetetiveRatio = onlineGreedyCost / offlineCost;
+		
+		double onlineCompetetiveRatioD = onlineCostD / offlineCostD;
+		double greedyCompetetiveRatioD = onlineGreedyCost / offlineCostD;
 
 		System.out.println("Competitive Ratio between online and offline: "
 				+ onlineCompetetiveRatio);
 		System.out
 				.println("Competitive Ratio between greedy online and offline: "
 						+ greedyCompetetiveRatio);
+		
+		System.out.println("Competitive Ratio between online and offline: "
+				+ onlineCompetetiveRatioD);
+		System.out
+				.println("Competitive Ratio between greedy online and offline: "
+						+ greedyCompetetiveRatioD);
 
 		// HUNGARIAN
 		double hungarianCost = bell.execute(numNodes, "hungarian",
